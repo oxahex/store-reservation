@@ -1,0 +1,4 @@
+rootProject.name = 'store-reservation'
+include 'api'
+include 'domain'
+

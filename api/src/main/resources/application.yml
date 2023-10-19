@@ -1,0 +1,6 @@
+spring:
+  profiles:
+    include:
+      - domain
+server:
+  port: 8080
