@@ -24,12 +24,12 @@ public class SignUpController {
     /**
      * 회원 가입 기능
      * 최초 회원 가입 시 모든 유저는 ROLE_USER 로 정의합니다.
+     * 이후 파트너스 회원 가입 시 ROLE_PARTNERS 로 전환됩니다.
      */
     @PostMapping("/signup")
-    public ResponseEntity<UserDto.Info> signUp(@RequestBody @Valid SignUpDto.Request request) {
-
-        log.info("SignUpController.signUp request={}", request);
-
+    public ResponseEntity<UserDto.Info> signUp(
+            @RequestBody @Valid SignUpDto.Request request
+    ) {
         return new ResponseEntity<>(userService.createUser(request), HttpStatus.OK);
     }
 }
