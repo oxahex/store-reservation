@@ -16,6 +16,10 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    /**
+     * 유저 생성
+     * <p>새 유저 정보를 DB에 저장하고, 유저의 정보를 반환합니다.
+     */
     public UserDto.Info createUser(SignUpDto.Request request) {
 
         User user = userRepository.save(User.builder()
