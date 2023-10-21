@@ -6,7 +6,7 @@ build/
 !**/src/test/**/build/
 
 ### Secret Key ###
-!**/resources/application-SECRET-KEY.properties
+/src/main/resources/application-SECRET-KEY.yml
 
 ### STS ###
 .apt_generated
