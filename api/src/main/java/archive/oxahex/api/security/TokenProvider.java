@@ -28,7 +28,7 @@ public class TokenProvider {
      * <p>email, role로 발급
      */
     public String generateToken(String email, RoleType role) {
-        Claims claims = Jwts.claims();
+        Claims claims = Jwts.claims().setSubject(email);
         claims.put(KEY_EMAIL, email);
         claims.put(KEY_ROLE, role);
 

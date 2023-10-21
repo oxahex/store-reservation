@@ -36,4 +36,8 @@ public class User extends BaseEntity {
 
     @Column(name = "registered_date")
     private LocalDateTime registeredDate;
+
+    public void setRole(RoleType role) {
+        this.role = role;
+    }
 }

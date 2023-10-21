@@ -1,5 +1,6 @@
 package archive.oxahex.api.controller;
 
+import archive.oxahex.api.dto.PartnersDto;
 import archive.oxahex.api.dto.SignInDto;
 import archive.oxahex.api.dto.SignUpDto;
 import archive.oxahex.api.dto.UserDto;
@@ -8,6 +9,8 @@ import archive.oxahex.api.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,6 +41,7 @@ public class AuthController {
      * <p>유저의 email, password 정보를 받음.
      * <p>가입된 유저인지 검증하고,
      * <p>정상적으로 인증된 유저의 경우 JWT Token 발급
+     * <p>유저 DB에 저장된 Role Type(권한)이 JWT 토큰에 포함된다.
      */
     @PostMapping("/signin")
     public ResponseEntity<SignInDto.Response> signIn(
@@ -51,5 +55,25 @@ public class AuthController {
         response.setToken(token);
 
         return ResponseEntity.ok().body(response);
+    }
+
+    /**
+     * 파트너스 등록(사업자 등록 번호 마다 파트너스 등록이 가능하다)
+     * <p>로그인한 회원인 경우 파트너스 회원 신청을 할 수 있다.
+     * <p>사업자 등록이 된 사람만 파트너스에 등록할 수 있는 것으로 정의, 사업자 등록 번호를 추가 정보로 받는다.
+     * <p>파트너스 회원 등록 시, 응답으로 업데이트된 roleType이 포함된 유저 정보를 반환한다.
+     */
+    @PostMapping("/partners")
+    @PreAuthorize("hasRole('USER') or hasRole('PARTNERS')")
+    public ResponseEntity<UserDto.Info> joinPartners(
+            Authentication auth, @RequestBody @Valid PartnersDto.Request request
+    ) {
+
+
+        return ResponseEntity.ok().body(
+                userService.createPartners(auth, request)
+        );
+
+
     }
 }
