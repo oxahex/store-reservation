@@ -1,6 +1,7 @@
 package archive.oxahex.api.handler;
 
 import archive.oxahex.api.dto.ErrorResponse;
+import archive.oxahex.api.exception.UserException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,18 @@ public class GlobalExceptionHandler {
         );
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UserException.class)
+    public ResponseEntity<ErrorResponse> userException(UserException e) {
+
+        log.error("[UserException]", e);
+        ErrorResponse errorResponse = new ErrorResponse(
+                e.getHttpStatus().toString(),
+                e.getErrorMessage()
+        );
+
+        return new ResponseEntity<>(errorResponse, e.getHttpStatus());
     }
 
     /**

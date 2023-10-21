@@ -21,11 +21,14 @@ public class User extends BaseEntity {
     @Column(name = "user_id")
     private Long id;
 
+    @Column(length = 50)
     private String name;
     private String password;
 
     @Column(name = "phone_number", length = 11)
     private String phoneNumber;
+
+    @Column(unique = true)
     private String email;
 
     @Enumerated(EnumType.STRING)

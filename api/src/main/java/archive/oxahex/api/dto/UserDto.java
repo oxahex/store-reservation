@@ -15,7 +15,6 @@ public class UserDto {
         private String username;
         private String email;
         private RoleType role;
-
     }
 
     public static UserDto.Info fromEntity(User user) {

@@ -61,9 +61,15 @@ project(":api") {
         implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
         implementation 'org.springframework.boot:spring-boot-starter-validation'
         implementation 'org.springframework.boot:spring-boot-starter-web'
-//        implementation 'org.springframework.boot:spring-boot-starter-security'
-//        implementation 'io.jsonwebtoken:jjwt'
-//        testImplementation 'org.springframework.security:spring-security-test'
+
+        implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+        implementation 'org.springframework.boot:spring-boot-starter-security'
+
+        implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
+        runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
+        runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
+        testImplementation 'org.springframework.security:spring-security-test'
     }
 }
 
@@ -77,7 +83,8 @@ project(":domain") {
 
     dependencies {
         implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-        implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+//        implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+        implementation 'org.springframework.boot:spring-boot-starter-security'
         runtimeOnly 'com.mysql:mysql-connector-j'
 
         // for test
@@ -103,7 +110,7 @@ dependencies {
 //    testImplementation 'org.springframework.security:spring-security-test'
 
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+//    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
     runtimeOnly 'com.h2database:h2'
 }
 
