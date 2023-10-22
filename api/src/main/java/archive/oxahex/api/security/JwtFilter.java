@@ -39,7 +39,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
         // Header에서 가져온 Token이 없거나 유효하지 않은 경우
         if (accessToken == null ||!tokenProvider.validateToken(accessToken)) {
-            log.error("Access Denied");
             filterChain.doFilter(request, response);
             return;
         }
