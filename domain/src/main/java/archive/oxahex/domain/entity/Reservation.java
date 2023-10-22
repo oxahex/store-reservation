@@ -2,13 +2,19 @@ package archive.oxahex.domain.entity;
 
 import archive.oxahex.domain.type.ReservationStatus;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "reservation")
+@Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Reservation extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,8 +28,6 @@ public class Reservation extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "store_id")
     private Store store;
-
-    private String code;
 
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
