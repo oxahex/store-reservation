@@ -17,7 +17,7 @@ public class SignUpDto {
         private String username;
 
         @NotBlank(message = "로그인에 사용할 비밀번호를 입력해주세요.")
-        @Min(value = 8, message = "비밀번호는 최소 8자 이상 입력해주세요.")
+        @Length(min = 8, message = "비밀번호는 최소 8자 이상 입력해주세요.")
         private String password;
 
         @NotBlank(message = "휴대폰 번호를 입력해주세요.")
