@@ -30,4 +30,7 @@ public class Reservation extends BaseEntity {
 
     @Column(name = "visit_date")
     private LocalDateTime visitDate;
+
+    @Column(name = "use_table_count")
+    private Integer useTableCount;
 }
