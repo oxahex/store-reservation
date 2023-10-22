@@ -6,6 +6,7 @@ import org.hibernate.annotations.DynamicInsert;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "store")
@@ -35,4 +36,7 @@ public class Store extends BaseEntity {
 
     @Column(name = "review_count", columnDefinition = "int default 0")
     private Integer reviewCount;
+
+    @Column(name = "registered_date")
+    private LocalDateTime registeredDate;
 }

@@ -1,5 +1,6 @@
 package archive.oxahex.api.service;
 
+import archive.oxahex.api.dto.SortType;
 import archive.oxahex.api.dto.StoreDto;
 import archive.oxahex.api.exception.ErrorType;
 import archive.oxahex.api.exception.CustomException;
@@ -12,6 +13,8 @@ import archive.oxahex.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -57,9 +60,20 @@ public class StoreService {
                         .description(request.getDescription())
                         .businessNumber(request.getBusinessNumber())
                         .tableCount(request.getTableCount())
+                        .registeredDate(LocalDateTime.now())
                         .build()
         );
 
         return StoreDto.fromEntityToStoreInfo(store);
     }
+
+    /**
+     * sortType 별로 등록된 모든 상점 리스트를 반환
+     */
+//    public void getAllStore(SortType sortType) {
+//
+//        switch (sortType) {
+//            case ASC -> storeRepository.fi
+//        }
+//    }
 }
