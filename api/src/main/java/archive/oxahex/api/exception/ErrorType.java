@@ -15,7 +15,8 @@ public enum ErrorType {
     ALREADY_EXIST_PARTNERS(HttpStatus.CONFLICT, "이미 등록된 사업자 입니다."),
     BUSINESS_NUMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "등록되지 않은 사업자 번호입니다."),
     ALREADY_EXIST_STORE(HttpStatus.CONFLICT, "이미 등록된 매장입니다."),
-    UN_MATCH_PARTNERS_USER(HttpStatus.FORBIDDEN, "본인의 사업자 번호가 아닙니다.");
+    UN_MATCH_PARTNERS_USER(HttpStatus.FORBIDDEN, "본인의 사업자 번호가 아닙니다."),
+    INVALID_SORT_TYPE(HttpStatus.BAD_REQUEST, "올바른 정렬 형식이 아닙니다.");
 
     private final HttpStatus httpStatus;
     private final String errorMessage;

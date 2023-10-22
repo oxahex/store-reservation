@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -70,10 +72,15 @@ public class StoreService {
     /**
      * sortType 별로 등록된 모든 상점 리스트를 반환
      */
-//    public void getAllStore(SortType sortType) {
-//
-//        switch (sortType) {
-//            case ASC -> storeRepository.fi
-//        }
-//    }
+    public List<StoreDto.Info> getAllStore(SortType sortType) {
+
+        List<Store> stores = null;
+        switch (sortType) {
+            case ASC -> stores = storeRepository.findAllByOrderByRegisteredDateAsc();
+            case RATING -> stores = storeRepository.findAllByOrderByRatingAsc();
+        }
+
+        return stores.stream().map(StoreDto::fromEntityToStoreInfo)
+                .collect(Collectors.toList());
+    }
 }
