@@ -16,5 +16,10 @@ public class PartnersDto {
         private String businessRegistrationNumber;
     }
 
-
+    @Getter
+    @Setter
+    public static class Response {
+        private UserDto.Info user;
+        private String token;
+    }
 }

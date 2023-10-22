@@ -65,15 +65,20 @@ public class AuthController {
      */
     @PostMapping("/partners")
     @PreAuthorize("hasRole('USER') or hasRole('PARTNERS')")
-    public ResponseEntity<UserDto.Info> joinPartners(
+    public ResponseEntity<PartnersDto.Response> joinPartners(
             Authentication auth, @RequestBody @Valid PartnersDto.Request request
     ) {
+        String email = auth.getName();
+        String businessNumber = request.getBusinessRegistrationNumber();
 
+        UserDto.Info userInfo = userService.createPartners(email, businessNumber, request);
 
-        return ResponseEntity.ok().body(
-                userService.createPartners(auth, request)
-        );
+        String token = tokenProvider.generateToken(userInfo.getEmail(), userInfo.getRole());
 
+        PartnersDto.Response response = new PartnersDto.Response();
+        response.setUser(userInfo);
+        response.setToken(token);
 
+        return ResponseEntity.ok().body(response);
     }
 }

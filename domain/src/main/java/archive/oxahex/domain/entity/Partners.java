@@ -3,10 +3,12 @@ package archive.oxahex.domain.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "partners")
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
