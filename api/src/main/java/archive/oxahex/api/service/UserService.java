@@ -38,7 +38,7 @@ public class UserService {
 
         boolean exists = userRepository.existsByEmail(request.getEmail());
         if (exists) {
-            throw new CustomException(ErrorType.USER_NOT_FOUND);
+            throw new CustomException(ErrorType.ALREADY_EXIST_USER);
         }
 
         User user = userRepository.save(User.builder()
@@ -51,7 +51,7 @@ public class UserService {
                 .build()
         );
 
-        return UserDto.fromEntity(user);
+        return UserDto.fromEntityToUserInfo(user);
     }
 
     /**
@@ -88,7 +88,7 @@ public class UserService {
         // 유저 권한 업데이트
         user.setRole(RoleType.ROLE_PARTNERS);
 
-        return UserDto.fromEntity(user);
+        return UserDto.fromEntityToUserInfo(user);
     }
 
     /**
@@ -106,6 +106,6 @@ public class UserService {
             throw new CustomException(ErrorType.WRONG_PASSWORD);
         }
 
-        return UserDto.fromEntity(user);
+        return UserDto.fromEntityToUserInfo(user);
     }
 }

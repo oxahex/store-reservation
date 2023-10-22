@@ -17,7 +17,7 @@ public class UserDto {
         private RoleType role;
     }
 
-    public static UserDto.Info fromEntity(User user) {
+    public static UserDto.Info fromEntityToUserInfo(User user) {
         UserDto.Info userInfo = new UserDto.Info();
         userInfo.setUsername(user.getName());
         userInfo.setRole(user.getRole());
