@@ -1,7 +1,7 @@
 package archive.oxahex.api.handler;
 
 import archive.oxahex.api.dto.ErrorResponse;
-import archive.oxahex.api.exception.UserException;
+import archive.oxahex.api.exception.CustomException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +9,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.nio.file.AccessDeniedException;
 
 @Slf4j
 @RestControllerAdvice
@@ -22,23 +24,35 @@ public class GlobalExceptionHandler {
         log.error("[MethodArgumentNotValidException]", e);
 
         ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                HttpStatus.BAD_REQUEST.value(),
                 bindingResult.getAllErrors().get(0).getDefaultMessage()
         );
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(UserException.class)
-    public ResponseEntity<ErrorResponse> userException(UserException e) {
+    @ExceptionHandler(CustomException.class)
+    public ResponseEntity<ErrorResponse> customException(CustomException e) {
 
-        log.error("[UserException]", e);
+        log.error("[CustomException]", e);
         ErrorResponse errorResponse = new ErrorResponse(
-                e.getHttpStatus().toString(),
+                e.getHttpStatus().value(),
                 e.getErrorMessage()
         );
 
         return new ResponseEntity<>(errorResponse, e.getHttpStatus());
+    }
+
+    // TODO: 컨트롤러 말고 그 이전 단계에서 잡히는 에러 처리
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> accessDeniedException(AccessDeniedException e) {
+        log.error("[AccessDeniedException]", e);
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.FORBIDDEN.value(),
+                e.getMessage()
+        );
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
     }
 
     /**
@@ -49,7 +63,7 @@ public class GlobalExceptionHandler {
 
         log.error("[Internal Server Error]", e);
         ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 e.getMessage()
         );
 

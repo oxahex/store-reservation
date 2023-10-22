@@ -9,7 +9,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ErrorResponse {
 
-    private String code;
+    private int code;
     private String message;
 
 }

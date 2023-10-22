@@ -5,7 +5,7 @@ import archive.oxahex.api.dto.SignInDto;
 import archive.oxahex.api.dto.SignUpDto;
 import archive.oxahex.api.dto.UserDto;
 import archive.oxahex.api.exception.ErrorType;
-import archive.oxahex.api.exception.UserException;
+import archive.oxahex.api.exception.CustomException;
 
 import archive.oxahex.domain.entity.Partners;
 import archive.oxahex.domain.entity.User;
@@ -14,7 +14,6 @@ import archive.oxahex.domain.repository.UserRepository;
 import archive.oxahex.domain.type.RoleType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +38,7 @@ public class UserService {
 
         boolean exists = userRepository.existsByEmail(request.getEmail());
         if (exists) {
-            throw new UserException(ErrorType.USER_NOT_FOUND);
+            throw new CustomException(ErrorType.USER_NOT_FOUND);
         }
 
         User user = userRepository.save(User.builder()
@@ -60,26 +59,25 @@ public class UserService {
      * <p>로그인 사용자 정보와 요청 정보(사업자 등록 번호)를 받아
      * <p>사업자가 확인되는 경우 파트너스 테이블에 저장
      * <p>(사업자 확인 로직은 구현하지 않음, 사업자 번호 정상 입력 시 존재하는 사업자로 간주)
-     * <p>파트너스 등록 시 해당 유저의 Role Type 변경 후 반환
+     * <p>파트너스 등록 시 해당 유저의 Role Type 변경 후 업데이트 된 권한 정보 반환
      */
     @Transactional
     public UserDto.Info createPartners(
-            Authentication auth, PartnersDto.Request request
+            String email, String businessNumber, PartnersDto.Request request
     ) {
 
         // 이미 등록된 사업자 번호인지 검증
         boolean exists =
-                partnersRepository.existsByBusinessNumber(request.getBusinessRegistrationNumber());
+                partnersRepository.existsByBusinessNumber(businessNumber);
 
         if (exists) {
-            throw new UserException(ErrorType.ALREADY_EXIST_PARTNERS);
+            throw new CustomException(ErrorType.ALREADY_EXIST_PARTNERS);
         }
 
         // 파트너스 정보 저장
-        log.info("auth={}", auth.getName());
-        String email = auth.getName();
+        log.info("auth={}", email);
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserException(ErrorType.USER_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ErrorType.USER_NOT_FOUND));
 
         partnersRepository.save(
                 Partners.builder()
@@ -87,6 +85,7 @@ public class UserService {
                         .user(user)
                         .build());
 
+        // 유저 권한 업데이트
         user.setRole(RoleType.ROLE_PARTNERS);
 
         return UserDto.fromEntity(user);
@@ -100,11 +99,11 @@ public class UserService {
 
         // 인증 처리
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new UserException(ErrorType.USER_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ErrorType.USER_NOT_FOUND));
 
         // 비밀 번호 확인
         if (!this.passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new UserException(ErrorType.ACCESS_DENIED);
+            throw new CustomException(ErrorType.WRONG_PASSWORD);
         }
 
         return UserDto.fromEntity(user);

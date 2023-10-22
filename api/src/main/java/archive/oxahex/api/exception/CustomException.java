@@ -5,12 +5,12 @@ import org.springframework.http.HttpStatus;
 
 
 @Getter
-public class UserException extends RuntimeException {
+public class CustomException extends RuntimeException {
 
     HttpStatus httpStatus;
     String errorMessage;
 
-    public UserException(ErrorType errorType) {
+    public CustomException(ErrorType errorType) {
         this.httpStatus = errorType.getHttpStatus();
         this.errorMessage = errorType.getErrorMessage();
     }
