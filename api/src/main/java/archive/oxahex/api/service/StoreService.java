@@ -16,13 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class StoreService {
 
-    private final UserRepository userRepository;
     private final StoreRepository storeRepository;
     private final PartnersRepository partnersRepository;
 
@@ -33,18 +31,14 @@ public class StoreService {
      * <p>이미 등록된 매장인 경우 등록 불가(사업자 등록 번호와 매장은 1:1이므로 사업자 등록 번호로 매장 중복 확인 가능)
      */
     @Transactional
-    public StoreDto.Info registerStore(String email, StoreDto.Request request) {
-
-        // 요청 유저의 이메일로 해당 유저를 찾고
-        User requestUser = userRepository.findByEmail(email)
-                .orElseThrow(() -> new CustomException(ErrorType.USER_NOT_FOUND));
+    public Store registerStore(User user, StoreDto.Request request) {
 
         // 파트너스에 등록된 사업자 번호의 userId를 가져옴
         Partners partners = partnersRepository.findByBusinessNumber(request.getBusinessNumber())
                 .orElseThrow(() -> new CustomException(ErrorType.BUSINESS_NUMBER_NOT_FOUND));
 
         // 요청 유저와 파트너스 유저가 일치하지 않는 경우
-        if (requestUser != partners.getUser()) {
+        if (user != partners.getUser()) {
             throw new CustomException(ErrorType.UN_MATCH_PARTNERS_USER);
         }
 
@@ -55,7 +49,7 @@ public class StoreService {
         }
 
         // 스토어
-        Store store = storeRepository.save(
+        return storeRepository.save(
                 Store.builder()
                         .name(request.getName())
                         .address(request.getAddress())
@@ -65,14 +59,12 @@ public class StoreService {
                         .registeredDate(LocalDateTime.now())
                         .build()
         );
-
-        return StoreDto.fromEntityToStoreInfo(store);
     }
 
     /**
      * sortType 별로 등록된 모든 상점 리스트를 반환
      */
-    public List<StoreDto.Info> getAllStore(SortType sortType) {
+    public List<Store> getAllStore(SortType sortType) {
 
         List<Store> stores = null;
         switch (sortType) {
@@ -80,7 +72,6 @@ public class StoreService {
             case RATING -> stores = storeRepository.findAllByOrderByRatingAsc();
         }
 
-        return stores.stream().map(StoreDto::fromEntityToStoreInfo)
-                .collect(Collectors.toList());
+        return stores;
     }
 }

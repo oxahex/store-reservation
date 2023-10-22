@@ -14,6 +14,7 @@ public class StoreDto {
     @Setter
     public static class Detail {
 
+        private Long id;
         private String name;
         private String address;
         private String description;
@@ -66,5 +67,18 @@ public class StoreDto {
         storeInfo.setTableCount(store.getTableCount());
 
         return storeInfo;
+    }
+
+    public static StoreDto.Detail fromEntityToStoreDetail(Store store) {
+        StoreDto.Detail storeDetail = new StoreDto.Detail();
+        storeDetail.setId(store.getId());
+        storeDetail.setName(store.getName());
+        storeDetail.setAddress(store.getAddress());
+        storeDetail.setDescription(store.getDescription());
+        storeDetail.setTableCount(store.getTableCount());
+        storeDetail.setRating(store.getRating());
+        storeDetail.setReviewCount(store.getReviewCount());
+
+        return storeDetail;
     }
 }

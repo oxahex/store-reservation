@@ -1,9 +1,6 @@
 package archive.oxahex.api.service;
 
-import archive.oxahex.api.dto.PartnersDto;
-import archive.oxahex.api.dto.SignInDto;
 import archive.oxahex.api.dto.SignUpDto;
-import archive.oxahex.api.dto.UserDto;
 import archive.oxahex.api.exception.ErrorType;
 import archive.oxahex.api.exception.CustomException;
 
@@ -14,6 +11,7 @@ import archive.oxahex.domain.repository.UserRepository;
 import archive.oxahex.domain.type.RoleType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +21,7 @@ import java.time.LocalDateTime;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserService {
 
     private final PasswordEncoder passwordEncoder;
@@ -30,18 +29,30 @@ public class UserService {
     private final PartnersRepository partnersRepository;
 
     /**
+     * email로 유저를 찾음
+     */
+
+    public User loadUserByAuth(Authentication auth) {
+
+        return userRepository.findByEmail(auth.getName())
+                .orElseThrow(() -> new CustomException(ErrorType.USER_NOT_FOUND));
+    }
+
+
+
+    /**
      * 유저 생성
      * <p>새 유저 정보를 DB에 저장하고, 유저의 정보를 반환합니다.
      */
     @Transactional
-    public UserDto.Info createUser(SignUpDto.Request request) {
+    public User createUser(SignUpDto.Request request) {
 
         boolean exists = userRepository.existsByEmail(request.getEmail());
         if (exists) {
             throw new CustomException(ErrorType.ALREADY_EXIST_USER);
         }
 
-        User user = userRepository.save(User.builder()
+        return userRepository.save(User.builder()
                 .name(request.getUsername())
                 .password(this.passwordEncoder.encode(request.getPassword()))
                 .email(request.getEmail())
@@ -50,8 +61,6 @@ public class UserService {
                 .registeredDate(LocalDateTime.now())
                 .build()
         );
-
-        return UserDto.fromEntityToUserInfo(user);
     }
 
     /**
@@ -62,9 +71,10 @@ public class UserService {
      * <p>파트너스 등록 시 해당 유저의 Role Type 변경 후 업데이트 된 권한 정보 반환
      */
     @Transactional
-    public UserDto.Info createPartners(
-            String email, String businessNumber, PartnersDto.Request request
+    public User createPartners(
+            Authentication auth, String businessNumber
     ) {
+        User user = loadUserByAuth(auth);
 
         // 이미 등록된 사업자 번호인지 검증
         boolean exists =
@@ -74,38 +84,33 @@ public class UserService {
             throw new CustomException(ErrorType.ALREADY_EXIST_PARTNERS);
         }
 
-        // 파트너스 정보 저장
-        log.info("auth={}", email);
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new CustomException(ErrorType.USER_NOT_FOUND));
-
         partnersRepository.save(
                 Partners.builder()
-                        .businessNumber(request.getBusinessRegistrationNumber())
+                        .businessNumber(businessNumber)
                         .user(user)
                         .build());
 
         // 유저 권한 업데이트
         user.setRole(RoleType.ROLE_PARTNERS);
 
-        return UserDto.fromEntityToUserInfo(user);
+        return user;
     }
 
     /**
      * 유저가 입력한 email, password로 인증 작업
      * <p>인증이 완료되면 인증 완료 된 유저 정보 반환
      */
-    public UserDto.Info authenticate(SignInDto.Request request) {
+    public User authenticate(String email, String password) {
 
         // 인증 처리
-        User user = userRepository.findByEmail(request.getEmail())
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(ErrorType.USER_NOT_FOUND));
 
         // 비밀 번호 확인
-        if (!this.passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+        if (!this.passwordEncoder.matches(password, user.getPassword())) {
             throw new CustomException(ErrorType.WRONG_PASSWORD);
         }
 
-        return UserDto.fromEntityToUserInfo(user);
+        return user;
     }
 }

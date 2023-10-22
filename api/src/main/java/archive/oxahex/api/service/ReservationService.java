@@ -26,13 +26,9 @@ public class ReservationService {
      * <p>상점 ID로 등록된 상점을 찾아 남아 있는 자리를 확인
      * <p>(프론트단에서 처리하더라도, 값 변경 가능하므로 다시 확인)
      */
-    public ReservationDto.Detail requestReservation(
-            String email, Long storeId, ReservationDto.Request request
+    public Reservation requestReservation(
+            User user, Long storeId, ReservationDto.Request request
     ) {
-
-        // 요청 유저
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new CustomException(ErrorType.USER_NOT_FOUND));
 
         // 해당 상점의 남아 있는 자리를 반환
         Store store = storeRepository.findById(storeId)
@@ -44,7 +40,8 @@ public class ReservationService {
         }
 
         // 예약 생성, 예약 상태는 PENDING
-        Reservation reservation = reservationRepository.save(
+
+        return reservationRepository.save(
                 Reservation.builder()
                         .user(user)
                         .store(store)
@@ -53,7 +50,5 @@ public class ReservationService {
                         .useTableCount(request.getUseTableCount())
                         .build()
         );
-
-        return ReservationDto.fromEntityToReservationDetail(reservation);
     }
 }

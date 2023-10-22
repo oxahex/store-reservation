@@ -1,5 +1,6 @@
 package archive.oxahex.api.dto;
 
+import archive.oxahex.domain.entity.User;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,5 +22,15 @@ public class PartnersDto {
     public static class Response {
         private UserDto.Info user;
         private String token;
+    }
+
+    public static PartnersDto.Response fromEntityToPartnersResponse(
+            User user, String token
+    ) {
+        PartnersDto.Response partnersResponse = new PartnersDto.Response();
+        partnersResponse.setUser(UserDto.fromEntityToUserInfo(user));
+        partnersResponse.setToken(token);
+
+        return partnersResponse;
     }
 }

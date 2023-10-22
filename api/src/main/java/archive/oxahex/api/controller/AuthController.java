@@ -6,6 +6,7 @@ import archive.oxahex.api.dto.SignUpDto;
 import archive.oxahex.api.dto.UserDto;
 import archive.oxahex.api.security.TokenProvider;
 import archive.oxahex.api.service.UserService;
+import archive.oxahex.domain.entity.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +34,8 @@ public class AuthController {
     public ResponseEntity<UserDto.Info> signUp(
             @RequestBody @Valid SignUpDto.Request request
     ) {
-        return ResponseEntity.ok().body(userService.createUser(request));
+        User user = userService.createUser(request);
+        return ResponseEntity.ok().body(UserDto.fromEntityToUserInfo(user));
     }
 
     /**
@@ -48,13 +50,14 @@ public class AuthController {
             @RequestBody @Valid SignInDto.Request request
     ) {
 
-        UserDto.Info verifiedUser = userService.authenticate(request);
-        String token = tokenProvider.generateToken(verifiedUser.getEmail(), verifiedUser.getRole());
+        User verifiedUser = userService.authenticate(request.getEmail(), request.getPassword());
+        String token = tokenProvider.generateToken(verifiedUser.getEmail(), verifiedUser.getId(), verifiedUser.getRole());
 
-        SignInDto.Response response = new SignInDto.Response();
-        response.setToken(token);
+        SignInDto.Response signInResponse =
+                SignInDto.fromEntityToSignInResponse(verifiedUser, token);
 
-        return ResponseEntity.ok().body(response);
+
+        return ResponseEntity.ok().body(signInResponse);
     }
 
     /**
@@ -68,17 +71,19 @@ public class AuthController {
     public ResponseEntity<PartnersDto.Response> joinPartners(
             Authentication auth, @RequestBody @Valid PartnersDto.Request request
     ) {
-        String email = auth.getName();
-        String businessNumber = request.getBusinessRegistrationNumber();
 
-        UserDto.Info userInfo = userService.createPartners(email, businessNumber, request);
+        User user = userService.createPartners(
+                auth, request.getBusinessRegistrationNumber()
+        );
 
-        String token = tokenProvider.generateToken(userInfo.getEmail(), userInfo.getRole());
+        String token = tokenProvider.generateToken(
+                user.getEmail(), user.getId(), user.getRole()
+        );
 
-        PartnersDto.Response response = new PartnersDto.Response();
-        response.setUser(userInfo);
-        response.setToken(token);
+        PartnersDto.Response partnersResponse =
+                PartnersDto.fromEntityToPartnersResponse(user, token);
 
-        return ResponseEntity.ok().body(response);
+
+        return ResponseEntity.ok().body(partnersResponse);
     }
 }

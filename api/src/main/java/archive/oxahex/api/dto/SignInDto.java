@@ -1,7 +1,7 @@
 package archive.oxahex.api.dto;
 
 
-import jakarta.validation.constraints.Min;
+import archive.oxahex.domain.entity.User;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
@@ -27,6 +27,16 @@ public class SignInDto {
     @Getter
     @Setter
     public static class Response {
+        private UserDto.Info user;
         private String token;
+    }
+
+    public static SignInDto.Response fromEntityToSignInResponse(User user, String token) {
+
+        SignInDto.Response signInResponse = new SignInDto.Response();
+        signInResponse.setUser(UserDto.fromEntityToUserInfo(user));
+        signInResponse.setToken(token);
+
+        return signInResponse;
     }
 }

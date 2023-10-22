@@ -2,6 +2,9 @@ package archive.oxahex.api.controller;
 
 import archive.oxahex.api.dto.ReservationDto;
 import archive.oxahex.api.service.ReservationService;
+import archive.oxahex.api.service.UserService;
+import archive.oxahex.domain.entity.Reservation;
+import archive.oxahex.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -12,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ReservationController {
 
+    private final UserService userService;
     private final ReservationService reservationService;
 
     /**
@@ -24,10 +28,14 @@ public class ReservationController {
             @RequestBody ReservationDto.Request request
     ) {
 
-        String email = auth.getName();
-        ReservationDto.Detail reservationDetail =
-                reservationService.requestReservation(email, storeId, request);
+        User user = userService.loadUserByAuth(auth);
+        Reservation reservation =
+                reservationService.requestReservation(user, storeId, request);
 
-        return ResponseEntity.ok().body(reservationDetail);
+
+
+        return ResponseEntity.ok().body(
+                ReservationDto.fromEntityToReservationDetail(reservation)
+        );
     }
 }

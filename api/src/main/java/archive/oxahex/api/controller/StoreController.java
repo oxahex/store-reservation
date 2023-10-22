@@ -3,6 +3,7 @@ package archive.oxahex.api.controller;
 import archive.oxahex.api.dto.SortType;
 import archive.oxahex.api.dto.StoreDto;
 import archive.oxahex.api.service.StoreService;
+import archive.oxahex.domain.entity.Store;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,7 +33,10 @@ public class StoreController {
     ) {
 
         SortType sortType = SortType.getSortType(sort);
+        List<Store> stores = storeService.getAllStore(sortType);
+        List<StoreDto.Info> storeInfos = stores.stream()
+                .map(StoreDto::fromEntityToStoreInfo).toList();
 
-        return ResponseEntity.ok().body(storeService.getAllStore(sortType));
+        return ResponseEntity.ok().body(storeInfos);
     }
 }
