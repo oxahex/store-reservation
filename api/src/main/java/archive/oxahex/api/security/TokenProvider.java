@@ -18,6 +18,7 @@ public class TokenProvider {
 
     private static final long TOKEN_EXPIRE_TIME = 1000 * 60 * 60;   // 1h
     private static final String KEY_EMAIL = "email";
+    private static final String KEY_ID = "id";
     private static final String KEY_ROLE = "role";
 
     @Value("${spring.jwt.secret}")
@@ -27,9 +28,10 @@ public class TokenProvider {
      * 토큰 생성(발급)
      * <p>email, role로 발급
      */
-    public String generateToken(String email, RoleType role) {
+    public String generateToken(Long userId, String email, RoleType role) {
         Claims claims = Jwts.claims().setSubject(email);
         claims.put(KEY_EMAIL, email);
+        claims.put(KEY_ID, userId);
         claims.put(KEY_ROLE, role);
 
         Date now = new Date(System.currentTimeMillis());
@@ -47,6 +49,11 @@ public class TokenProvider {
     public String getUserEmail(String token) {
         Claims claims = parseClaims(token);
         return claims.get(KEY_EMAIL, String.class);
+    }
+
+    public Long getUserId(String token) {
+        Claims claims = parseClaims(token);
+        return claims.get(KEY_ID, Long.class);
     }
 
     public String getUserRole(String token) {
