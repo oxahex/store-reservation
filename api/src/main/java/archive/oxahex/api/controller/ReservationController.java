@@ -2,7 +2,7 @@ package archive.oxahex.api.controller;
 
 import archive.oxahex.api.dto.ReservationDto;
 import archive.oxahex.api.service.ReservationService;
-import archive.oxahex.api.service.UserService;
+import archive.oxahex.api.service.AuthService;
 import archive.oxahex.domain.entity.Reservation;
 import archive.oxahex.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ReservationController {
 
-    private final UserService userService;
+    private final AuthService userService;
     private final ReservationService reservationService;
 
     /**
