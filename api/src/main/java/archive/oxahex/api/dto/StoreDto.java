@@ -25,6 +25,7 @@ public class StoreDto {
     @Getter
     @Setter
     public static class Info {
+        private Long id;
         private String name;
         private String address;
         private String description;
@@ -58,6 +59,7 @@ public class StoreDto {
 
     public static StoreDto.Info fromEntityToStoreInfo(Store store) {
         StoreDto.Info storeInfo = new StoreDto.Info();
+        storeInfo.setId(store.getId());
         storeInfo.setName(store.getName());
         storeInfo.setAddress(store.getAddress());
         storeInfo.setDescription(store.getDescription());
