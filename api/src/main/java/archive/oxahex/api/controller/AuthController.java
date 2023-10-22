@@ -5,7 +5,7 @@ import archive.oxahex.api.dto.SignInDto;
 import archive.oxahex.api.dto.SignUpDto;
 import archive.oxahex.api.dto.UserDto;
 import archive.oxahex.api.security.TokenProvider;
-import archive.oxahex.api.service.UserService;
+import archive.oxahex.api.service.AuthService;
 import archive.oxahex.domain.entity.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final UserService userService;
+    private final AuthService userService;
     private final TokenProvider tokenProvider;
 
     /**
@@ -51,7 +51,7 @@ public class AuthController {
     ) {
 
         User verifiedUser = userService.authenticate(request.getEmail(), request.getPassword());
-        String token = tokenProvider.generateToken(verifiedUser.getEmail(), verifiedUser.getId(), verifiedUser.getRole());
+        String token = tokenProvider.generateToken(verifiedUser.getId(), verifiedUser.getEmail(), verifiedUser.getRole());
 
         SignInDto.Response signInResponse =
                 SignInDto.fromEntityToSignInResponse(verifiedUser, token);
@@ -72,12 +72,11 @@ public class AuthController {
             Authentication auth, @RequestBody @Valid PartnersDto.Request request
     ) {
 
-        User user = userService.createPartners(
-                auth, request.getBusinessRegistrationNumber()
-        );
+        User user = userService.loadUserByAuth(auth);
+        userService.createPartners(user, request.getBusinessRegistrationNumber());
 
         String token = tokenProvider.generateToken(
-                user.getEmail(), user.getId(), user.getRole()
+                user.getId(), user.getEmail(), user.getRole()
         );
 
         PartnersDto.Response partnersResponse =

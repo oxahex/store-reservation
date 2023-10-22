@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class UserService {
+public class AuthService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
@@ -31,9 +31,9 @@ public class UserService {
     /**
      * email로 유저를 찾음
      */
-
     public User loadUserByAuth(Authentication auth) {
 
+        log.info("auth.name={}", auth.getName());
         return userRepository.findByEmail(auth.getName())
                 .orElseThrow(() -> new CustomException(ErrorType.USER_NOT_FOUND));
     }
@@ -71,10 +71,9 @@ public class UserService {
      * <p>파트너스 등록 시 해당 유저의 Role Type 변경 후 업데이트 된 권한 정보 반환
      */
     @Transactional
-    public User createPartners(
-            Authentication auth, String businessNumber
+    public void createPartners(
+            User user, String businessNumber
     ) {
-        User user = loadUserByAuth(auth);
 
         // 이미 등록된 사업자 번호인지 검증
         boolean exists =
@@ -92,8 +91,6 @@ public class UserService {
 
         // 유저 권한 업데이트
         user.setRole(RoleType.ROLE_PARTNERS);
-
-        return user;
     }
 
     /**
