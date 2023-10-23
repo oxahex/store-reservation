@@ -12,6 +12,13 @@ public class PartnersDto {
     @Getter
     @Setter
     public static class Info {
+        private Long id;
+        private String name;
+    }
+
+    @Getter
+    @Setter
+    public static class Detail {
         private String name;
         private UserDto.Info user;
     }
@@ -29,23 +36,31 @@ public class PartnersDto {
     @Getter
     @Setter
     public static class Response {
-        private PartnersDto.Info partners;
+        private Detail partners;
         private String token;
     }
 
-    public static PartnersDto.Info fromEntityToPartnersInfo(Partners partners, User user) {
-        PartnersDto.Info partnersInfo = new PartnersDto.Info();
+    public static Info fromEntityToPartnersInfo(Partners partners) {
+        Info partnersInfo = new PartnersDto.Info();
+        partnersInfo.setId(partners.getId());
         partnersInfo.setName(partners.getName());
-        partnersInfo.setUser(UserDto.fromEntityToUserInfo(user));
 
         return partnersInfo;
     }
 
-    public static PartnersDto.Response fromEntityToPartnersResponse(
+    public static Detail fromEntityToPartnersDetail(Partners partners, User user) {
+        Detail partnersDetail = new Detail();
+        partnersDetail.setName(partners.getName());
+        partnersDetail.setUser(UserDto.fromEntityToUserInfo(user));
+
+        return partnersDetail;
+    }
+
+    public static Response fromEntityToPartnersResponse(
             User user, Partners partners, String token
     ) {
         PartnersDto.Response partnersResponse = new PartnersDto.Response();
-        partnersResponse.setPartners(PartnersDto.fromEntityToPartnersInfo(partners, user));
+        partnersResponse.setPartners(PartnersDto.fromEntityToPartnersDetail(partners, user));
         partnersResponse.setToken(token);
 
         return partnersResponse;

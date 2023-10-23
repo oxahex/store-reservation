@@ -1,10 +1,12 @@
 package archive.oxahex.api.controller;
 
+import archive.oxahex.api.dto.PartnersDto;
 import archive.oxahex.api.dto.StoreDto;
 import archive.oxahex.api.security.TokenProvider;
 import archive.oxahex.api.service.PartnersService;
 import archive.oxahex.api.service.StoreService;
 import archive.oxahex.api.service.AuthService;
+import archive.oxahex.domain.entity.Partners;
 import archive.oxahex.domain.entity.Store;
 import archive.oxahex.domain.entity.User;
 import jakarta.validation.Valid;
@@ -31,6 +33,22 @@ public class PartnersController {
     private final TokenProvider tokenProvider;
 
     /**
+     * 생성한 파트너스 전체 조회
+     * 유저가 생성한 파트너스 정보 전체 조회(매장 등록 시 사용)
+     */
+    @GetMapping
+    public ResponseEntity<List<PartnersDto.Info>> getAllPartners(Authentication auth) {
+        User user = userService.loadUserByAuth(auth);
+
+        List<Partners> partnersList = partnersService.getAllPartners(user);
+        List<PartnersDto.Info> partnersInfos =
+                partnersList.stream().map(PartnersDto::fromEntityToPartnersInfo).toList();
+
+        return ResponseEntity.ok().body(partnersInfos);
+    }
+
+
+    /**
      * PARTNERS 회원인 경우 매장 등록
      * 연결할 파트너스 정보와 매장 정보를 입력값으로 받음
      * 매장 등록 성공 시 등록 정보 반환
@@ -54,7 +72,7 @@ public class PartnersController {
      * <p>등록된 파트너스만 접근 가능
      */
     @GetMapping("/stores")
-    public ResponseEntity<List<StoreDto.Info>> partners(
+    public ResponseEntity<List<StoreDto.Info>> getAllStore(
             Authentication auth
     ) {
 
