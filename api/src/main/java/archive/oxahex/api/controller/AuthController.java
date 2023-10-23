@@ -6,6 +6,7 @@ import archive.oxahex.api.dto.SignUpDto;
 import archive.oxahex.api.dto.UserDto;
 import archive.oxahex.api.security.TokenProvider;
 import archive.oxahex.api.service.AuthService;
+import archive.oxahex.domain.entity.Partners;
 import archive.oxahex.domain.entity.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -61,10 +62,9 @@ public class AuthController {
     }
 
     /**
-     * 파트너스 등록(사업자 등록 번호 마다 파트너스 등록이 가능하다)
+     * 파트너스 등록
      * <p>로그인한 회원인 경우 파트너스 회원 신청을 할 수 있다.
-     * <p>사업자 등록이 된 사람만 파트너스에 등록할 수 있는 것으로 정의, 사업자 등록 번호를 추가 정보로 받는다.
-     * <p>파트너스 회원 등록 시, 응답으로 업데이트된 roleType이 포함된 유저 정보를 반환한다.
+     * <p>파트너스 회원 등록 시, 응답으로 업데이트된 roleType이 포함된 유저 정보와 등록한 파트너스 정보를 반환한다.
      */
     @PostMapping("/partners")
     @PreAuthorize("hasRole('USER') or hasRole('PARTNERS')")
@@ -73,14 +73,14 @@ public class AuthController {
     ) {
 
         User user = userService.loadUserByAuth(auth);
-        userService.createPartners(user, request.getBusinessRegistrationNumber());
+        Partners partners = userService.createPartners(user, request.getName());
 
         String token = tokenProvider.generateToken(
                 user.getId(), user.getEmail(), user.getRole()
         );
 
         PartnersDto.Response partnersResponse =
-                PartnersDto.fromEntityToPartnersResponse(user, token);
+                PartnersDto.fromEntityToPartnersResponse(user, partners, token);
 
 
         return ResponseEntity.ok().body(partnersResponse);
