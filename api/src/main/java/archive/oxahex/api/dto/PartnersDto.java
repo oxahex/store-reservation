@@ -28,7 +28,7 @@ public class PartnersDto {
     public static class Request {
 
         @NotBlank(message = "파트너스 이름을 작성해주세요.")
-        @Length(min = 10, message = "파트너스 이름은 4자 이상 입력해주세요.")
+        @Length(min = 4, message = "파트너스 이름은 4자 이상 입력해주세요.")
         @Length(max = 100, message = "파트너스 이름은 100자 이하로 입력해주세요.")
         private String name;
     }
