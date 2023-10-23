@@ -10,8 +10,5 @@ import java.util.Optional;
 @Repository
 public interface PartnersRepository extends JpaRepository<Partners, Long> {
 
-    boolean existsByBusinessNumber(String businessNumber);
-    Optional<Partners> findByBusinessNumber(String businessNumber);
-
-    List<Partners> findAllByUserId(Long userId);
+    boolean existsByName(String name);
 }

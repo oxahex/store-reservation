@@ -19,6 +19,8 @@ public class Partners extends BaseEntity {
     @Column(name = "partners_id")
     private Long id;
 
+    @Column(length = 100, unique = true)
+    private String name;
 
     @Column(name = "business_number", length = 10, unique = true)
     private String businessNumber;
@@ -26,4 +28,6 @@ public class Partners extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    // 매장 정보 조회용 필드
 }

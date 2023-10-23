@@ -65,32 +65,28 @@ public class AuthService {
 
     /**
      * 파트너스 등록
-     * <p>로그인 사용자 정보와 요청 정보(사업자 등록 번호)를 받아
-     * <p>사업자가 확인되는 경우 파트너스 테이블에 저장
-     * <p>(사업자 확인 로직은 구현하지 않음, 사업자 번호 정상 입력 시 존재하는 사업자로 간주)
+     * <p>등록 조건은 따로 없음(현재 로그인이 확인되는 경우)
+     * <p>파트너스 테이블에 해당 파트너스 저장
      * <p>파트너스 등록 시 해당 유저의 Role Type 변경 후 업데이트 된 권한 정보 반환
      */
     @Transactional
-    public void createPartners(
-            User user, String businessNumber
-    ) {
+    public Partners createPartners(User user, String name) {
 
-        // 이미 등록된 사업자 번호인지 검증
-        boolean exists =
-                partnersRepository.existsByBusinessNumber(businessNumber);
-
+        // 이미 등록된 이름인지 검증
+        boolean exists = partnersRepository.existsByName(name);
         if (exists) {
-            throw new CustomException(ErrorType.ALREADY_EXIST_PARTNERS);
+            throw new CustomException(ErrorType.ALREADY_EXIST_PARTNERS_NAME);
         }
-
-        partnersRepository.save(
-                Partners.builder()
-                        .businessNumber(businessNumber)
-                        .user(user)
-                        .build());
 
         // 유저 권한 업데이트
         user.setRole(RoleType.ROLE_PARTNERS);
+
+        // 파트너스 등록
+        return partnersRepository.save(
+                Partners.builder()
+                        .name(name)
+                        .user(user)
+                        .build());
     }
 
     /**

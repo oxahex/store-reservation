@@ -1,5 +1,6 @@
 package archive.oxahex.api.dto;
 
+import archive.oxahex.domain.entity.Partners;
 import archive.oxahex.domain.entity.User;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -10,25 +11,41 @@ public class PartnersDto {
 
     @Getter
     @Setter
+    public static class Info {
+        private String name;
+        private UserDto.Info user;
+    }
+
+    @Getter
+    @Setter
     public static class Request {
 
-        @NotBlank(message = "사업자 번호를 입력해주세요.")
-        @Length(min = 10, max = 10, message = "올바른 사업자 번호가 아닙니다.")
-        private String businessRegistrationNumber;
+        @NotBlank(message = "파트너스 이름을 작성해주세요.")
+        @Length(min = 10, message = "파트너스 이름은 4자 이상 입력해주세요.")
+        @Length(max = 100, message = "파트너스 이름은 100자 이하로 입력해주세요.")
+        private String name;
     }
 
     @Getter
     @Setter
     public static class Response {
-        private UserDto.Info user;
+        private PartnersDto.Info partners;
         private String token;
     }
 
+    public static PartnersDto.Info fromEntityToPartnersInfo(Partners partners, User user) {
+        PartnersDto.Info partnersInfo = new PartnersDto.Info();
+        partnersInfo.setName(partners.getName());
+        partnersInfo.setUser(UserDto.fromEntityToUserInfo(user));
+
+        return partnersInfo;
+    }
+
     public static PartnersDto.Response fromEntityToPartnersResponse(
-            User user, String token
+            User user, Partners partners, String token
     ) {
         PartnersDto.Response partnersResponse = new PartnersDto.Response();
-        partnersResponse.setUser(UserDto.fromEntityToUserInfo(user));
+        partnersResponse.setPartners(PartnersDto.fromEntityToPartnersInfo(partners, user));
         partnersResponse.setToken(token);
 
         return partnersResponse;

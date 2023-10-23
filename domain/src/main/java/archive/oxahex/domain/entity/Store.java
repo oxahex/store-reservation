@@ -39,4 +39,8 @@ public class Store extends BaseEntity {
 
     @Column(name = "registered_date")
     private LocalDateTime registeredDate;
+
+    @ManyToOne
+    @JoinColumn(name = "partners_id")
+    private Partners partners;
 }
