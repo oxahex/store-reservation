@@ -12,6 +12,7 @@ public enum ErrorType {
     STORE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 매장입니다."),
     ALREADY_EXIST_USER(HttpStatus.CONFLICT, "이미 존재하는 유저입니다."),
     ALREADY_EXIST_PARTNERS_NAME(HttpStatus.CONFLICT, "이미 존재하는 파트너스 이름입니다."),
+    PARTNERS_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 파트너스를 찾을 수 없습니다."),
     WRONG_PASSWORD(HttpStatus.UNAUTHORIZED, "패스워드가 일치하지 않습니다."),
     ACCESS_DENIED(HttpStatus.UNAUTHORIZED, "권한이 없습니다."),
     ALREADY_EXIST_PARTNERS(HttpStatus.CONFLICT, "이미 등록된 사업자 입니다."),
