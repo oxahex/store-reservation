@@ -66,24 +66,4 @@ public class PartnersController {
         // 매장 정보 반환
         return ResponseEntity.ok().body(storeInfo);
     }
-
-    /**
-     * 사업자 목록(등록 매장) 전체 조회
-     * <p>등록된 파트너스만 접근 가능
-     */
-    @GetMapping("/stores")
-    public ResponseEntity<List<StoreDto.Info>> getAllStore(
-            Authentication auth
-    ) {
-
-        log.info("Controller stores={}", auth.getName());
-        User user = userService.loadUserByAuth(auth);
-        List<Store> stores = partnersService.getAllPartnersStore(user);
-
-        List<StoreDto.Info> storeInfos = stores.stream()
-                .map(StoreDto::fromEntityToStoreInfo)
-                .toList();
-
-        return ResponseEntity.ok().body(storeInfos);
-    }
 }

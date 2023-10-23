@@ -22,22 +22,11 @@ public class PartnersService {
 
     /**
      * 사업자가 생성한 모든 파트너스 목록 조회
-     * 파트너스 이름 반환
+     * 파트너스 이름 반환(매장 등록 시 사용)
      */
     public List<Partners> getAllPartners(User user) {
 
         return partnersRepository.findAllByUser(user);
 
     }
-
-    /**
-     * 파트너스 사용자가 등록한 매장 조회
-     */
-    public List<Store> getAllPartnersStore(User user) {
-
-
-        return null;
-    }
-
-
 }
