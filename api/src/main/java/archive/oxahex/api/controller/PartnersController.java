@@ -4,6 +4,7 @@ import archive.oxahex.api.dto.PartnersDto;
 import archive.oxahex.api.dto.StoreDto;
 import archive.oxahex.api.security.TokenProvider;
 import archive.oxahex.api.service.PartnersService;
+import archive.oxahex.api.service.ReservationService;
 import archive.oxahex.api.service.StoreService;
 import archive.oxahex.api.service.AuthService;
 import archive.oxahex.domain.entity.Partners;
@@ -29,6 +30,7 @@ public class PartnersController {
     private final AuthService userService;
     private final StoreService storeService;
     private final PartnersService partnersService;
+    private final ReservationService reservationService;
 
     private final TokenProvider tokenProvider;
 
@@ -65,5 +67,21 @@ public class PartnersController {
 
         // 매장 정보 반환
         return ResponseEntity.ok().body(storeInfo);
+    }
+
+    /**
+     * 대기 상태 예약 목록 조회(파트너스 별 조회 x, 전체 조회)
+     * TODO: provider에서 파트너스 리스트를 꺼내 와도 괜찮을듯 굳이 매번 유저를 찾지 말고
+     */
+    @GetMapping("/reservations")
+    public ResponseEntity<?> getAllPendingReservation(Authentication auth) {
+
+        User user = userService.loadUserByAuth(auth);
+
+        // 예약 상태 타입으로 조회할 수 있는 메서드를 만들고, 재사용하면?
+
+//        reservationService.getAllPendingReservations()
+
+        return null;
     }
 }

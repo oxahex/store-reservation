@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -51,4 +53,23 @@ public class ReservationService {
 
         return reservationRepository.save(reservation);
     }
+
+    // TODO: 같은 데이터를 조회하는데 조건이 다양한 경우 어떻게 처리하면 좋을지?
+
+    /**
+     * 유저 정보(user id)와 상태 정보로 예약 정보를 가져옴
+     * 예약 대시/승인/거절 상태별로 조회 가능
+     * status가 없는 경우 전체 조회 처리
+     */
+    public List<Reservation> getReservationsByUser(ReservationStatus status) {
+
+
+        return null;
+    }
+
+    /**
+     * 매장 정보(store id)로 예약 정보를 가져옴
+     * TODO: provider에서 파트너스 id를 미리 받아서 파트너스 리스트를 넘겨주는 식으로 변경 필요
+     * 파트너스 id ->
+     */
 }
