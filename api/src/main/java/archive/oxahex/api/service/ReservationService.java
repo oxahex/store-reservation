@@ -11,8 +11,10 @@ import archive.oxahex.domain.repository.StoreRepository;
 import archive.oxahex.domain.repository.UserRepository;
 import archive.oxahex.domain.type.ReservationStatus;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ReservationService {
@@ -40,15 +42,13 @@ public class ReservationService {
         }
 
         // 예약 생성, 예약 상태는 PENDING
+        Reservation reservation = new Reservation();
+        reservation.setUser(user);
+        reservation.setStore(store, request.getUseTableCount());    // 이렇게 하면 헷갈릴 것 같은데, 오버라이드 된 이 메서드가 기본 setter보다 우선하게 강제할 수는 없을지?
+        reservation.setStatus(ReservationStatus.PENDING);
+        reservation.setVisitDate(request.getVisitedDate());
+        reservation.setUseTableCount(request.getUseTableCount());   // 해당 매장의 테이블 수 감소 처리(예약 생성 시 자동 감소)
 
-        return reservationRepository.save(
-                Reservation.builder()
-                        .user(user)
-                        .store(store)
-                        .status(ReservationStatus.PENDING)
-                        .visitDate(request.getVisitedDate())
-                        .useTableCount(request.getUseTableCount())
-                        .build()
-        );
+        return reservationRepository.save(reservation);
     }
 }

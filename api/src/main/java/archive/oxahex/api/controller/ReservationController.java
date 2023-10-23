@@ -5,13 +5,16 @@ import archive.oxahex.api.service.ReservationService;
 import archive.oxahex.api.service.AuthService;
 import archive.oxahex.domain.entity.Reservation;
 import archive.oxahex.domain.entity.User;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/reservation")
+@PreAuthorize("hasRole('USER') or hasRole('PARTNERS')")
 @RequiredArgsConstructor
 public class ReservationController {
 
@@ -25,7 +28,7 @@ public class ReservationController {
     public ResponseEntity<ReservationDto.Detail> requestReservation(
             Authentication auth,
             @PathVariable Long storeId,
-            @RequestBody ReservationDto.Request request
+            @RequestBody @Valid ReservationDto.Request request
     ) {
 
         User user = userService.loadUserByAuth(auth);

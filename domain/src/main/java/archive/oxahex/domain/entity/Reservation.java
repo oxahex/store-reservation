@@ -2,19 +2,15 @@ package archive.oxahex.domain.entity;
 
 import archive.oxahex.domain.type.ReservationStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "reservation")
 @Getter
+@Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class Reservation extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,4 +33,9 @@ public class Reservation extends BaseEntity {
 
     @Column(name = "use_table_count")
     private Integer useTableCount;
+
+    public void setStore(Store store, int count) {
+        store.removeTableCount(count);
+        this.store = store;
+    }
 }
