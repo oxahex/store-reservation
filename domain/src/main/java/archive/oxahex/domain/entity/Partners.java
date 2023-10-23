@@ -26,7 +26,7 @@ public class Partners extends BaseEntity {
     private User user;
 
     // 매장 정보 조회용 필드
-    @OneToMany(mappedBy = "store")
+    @OneToMany(mappedBy = "partners", cascade = CascadeType.REMOVE)
     List<Store> stores = new ArrayList<>();
 
     // 파트너스 생성 시 유저에 해당 파트너스 저장(리스트)

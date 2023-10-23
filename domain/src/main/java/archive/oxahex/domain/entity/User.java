@@ -39,7 +39,7 @@ public class User extends BaseEntity {
     @Column(name = "registered_date")
     private LocalDateTime registeredDate;
 
-    @OneToMany(mappedBy = "partners")
+    @OneToMany(mappedBy = "user")
     private List<Partners> partners = new ArrayList<>();
 
     public void setRole(RoleType role) {
