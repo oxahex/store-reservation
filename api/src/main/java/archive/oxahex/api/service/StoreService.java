@@ -29,7 +29,7 @@ public class StoreService {
      * 매장을 등록할 파트너스와 매장 정보를 받아 매장을 저장
      */
     @Transactional
-    public Store registerStore(User user, String partnersName, StoreDto.Request request) {
+    public Store registerStore(String partnersName, StoreDto.Request request) {
 
         Partners partners = partnersRepository.findByName(partnersName)
                 .orElseThrow(() -> new CustomException(ErrorType.PARTNERS_NOT_FOUND));

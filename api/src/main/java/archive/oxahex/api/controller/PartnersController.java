@@ -32,19 +32,17 @@ public class PartnersController {
 
     /**
      * PARTNERS 회원인 경우 매장 등록
+     * 연결할 파트너스 정보와 매장 정보를 입력값으로 받음
      * 매장 등록 성공 시 등록 정보 반환
      */
-    @PostMapping("/store")
+    @PostMapping("/{partnersName}/store")
     public ResponseEntity<StoreDto.Info> registerStore(
-            Authentication auth,
+            @PathVariable String partnersName,
             @RequestBody @Valid StoreDto.Request request
     ) {
 
-        // 요청 유저 이메일
-        User user = userService.loadUserByAuth(auth);
-
         // 등록한 매장 정보 데이터 받음
-        Store store = storeService.registerStore(user, request);
+        Store store = storeService.registerStore(partnersName, request);
         StoreDto.Info storeInfo = StoreDto.fromEntityToStoreInfo(store);
 
         // 매장 정보 반환
