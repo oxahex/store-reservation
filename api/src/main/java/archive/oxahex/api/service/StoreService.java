@@ -6,7 +6,6 @@ import archive.oxahex.api.exception.ErrorType;
 import archive.oxahex.api.exception.CustomException;
 import archive.oxahex.domain.entity.Partners;
 import archive.oxahex.domain.entity.Store;
-import archive.oxahex.domain.entity.User;
 import archive.oxahex.domain.repository.PartnersRepository;
 import archive.oxahex.domain.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
@@ -41,18 +40,17 @@ public class StoreService {
             throw new CustomException(ErrorType.ALREADY_EXIST_STORE);
         }
 
+        Store store = new Store();
+        store.setName(request.getName());
+        store.setAddress(request.getAddress());
+        store.setDescription(request.getDescription());
+        store.setBusinessNumber(request.getBusinessNumber());
+        store.setTableCount(request.getTableCount());
+        store.setRegisteredDate(LocalDateTime.now());
+        store.setPartners(partners);
+
         // 스토어
-        return storeRepository.save(
-                Store.builder()
-                        .name(request.getName())
-                        .address(request.getAddress())
-                        .description(request.getDescription())
-                        .businessNumber(request.getBusinessNumber())
-                        .tableCount(request.getTableCount())
-                        .registeredDate(LocalDateTime.now())
-                        .partners(partners)
-                        .build()
-        );
+        return storeRepository.save(store);
     }
 
     /**

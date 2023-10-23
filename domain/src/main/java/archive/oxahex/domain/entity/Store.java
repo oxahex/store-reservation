@@ -12,9 +12,8 @@ import java.time.LocalDateTime;
 @Table(name = "store")
 @DynamicInsert
 @Getter
+@Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class Store extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,4 +42,11 @@ public class Store extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "partners_id")
     private Partners partners;
+
+    // 매장 저장 시 partners.stores에도 매장 객체 저장
+    public void setPartners(Partners partners) {
+        this.partners = partners;
+        partners.getStores().add(this);
+    }
+
 }

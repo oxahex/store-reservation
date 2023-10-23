@@ -1,17 +1,16 @@
 package archive.oxahex.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "partners")
 @Getter
+@Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class Partners extends BaseEntity {
 
     @Id
@@ -22,12 +21,18 @@ public class Partners extends BaseEntity {
     @Column(length = 100, unique = true)
     private String name;
 
-    @Column(name = "business_number", length = 10, unique = true)
-    private String businessNumber;
-
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
     // 매장 정보 조회용 필드
+    @OneToMany(mappedBy = "store")
+    List<Store> stores = new ArrayList<>();
+
+    // 파트너스 생성 시 유저에 해당 파트너스 저장(리스트)
+    public void setUser(User user) {
+        this.user = user;
+        user.getPartners().add(this);
+    }
+
 }

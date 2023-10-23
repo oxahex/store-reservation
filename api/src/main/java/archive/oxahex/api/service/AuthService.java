@@ -81,12 +81,12 @@ public class AuthService {
         // 유저 권한 업데이트
         user.setRole(RoleType.ROLE_PARTNERS);
 
+        Partners partners = new Partners();
+        partners.setName(name);
+        partners.setUser(user);
+
         // 파트너스 등록
-        return partnersRepository.save(
-                Partners.builder()
-                        .name(name)
-                        .user(user)
-                        .build());
+        return partnersRepository.save(partners);
     }
 
     /**

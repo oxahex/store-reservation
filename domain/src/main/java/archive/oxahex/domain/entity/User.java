@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "user")
@@ -36,6 +38,9 @@ public class User extends BaseEntity {
 
     @Column(name = "registered_date")
     private LocalDateTime registeredDate;
+
+    @OneToMany(mappedBy = "partners")
+    private List<Partners> partners = new ArrayList<>();
 
     public void setRole(RoleType role) {
         this.role = role;
