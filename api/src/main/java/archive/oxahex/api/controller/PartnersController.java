@@ -12,6 +12,7 @@ import archive.oxahex.domain.entity.Partners;
 import archive.oxahex.domain.entity.Reservation;
 import archive.oxahex.domain.entity.Store;
 import archive.oxahex.domain.entity.User;
+import archive.oxahex.domain.type.ReservationStatus;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -94,4 +95,37 @@ public class PartnersController {
 
         return ResponseEntity.ok().body(reservationInfos);
     }
+
+    /**
+     * 특정 예약 거절
+     */
+    @PatchMapping("/reservations/reject/{reservationId}")
+    public ResponseEntity<ReservationDto.Detail> rejectReservation(
+            @PathVariable Long reservationId
+    ){
+        Reservation reservation =
+                reservationService.changeReservationStatus(ReservationStatus.REJECTED, reservationId);
+
+        ReservationDto.Detail reservationDetail =
+                ReservationDto.fromEntityToReservationDetail(reservation);
+
+        return ResponseEntity.ok().body(reservationDetail);
+    }
+
+    /**
+     * 특정 예약 승인
+     */
+    @PatchMapping("/reservations/allow/{reservationId}")
+    public ResponseEntity<ReservationDto.Detail> allowReservation(
+            @PathVariable Long reservationId
+    ) {
+        Reservation reservation =
+                reservationService.changeReservationStatus(ReservationStatus.ALLOWED, reservationId);
+
+        ReservationDto.Detail reservationDetail =
+                ReservationDto.fromEntityToReservationDetail(reservation);
+
+        return ResponseEntity.ok().body(reservationDetail);
+    }
+
 }

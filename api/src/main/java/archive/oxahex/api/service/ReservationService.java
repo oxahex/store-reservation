@@ -94,4 +94,21 @@ public class ReservationService {
 
         return reservations;
     }
+
+    /**
+     * 예약 거절 또는 승인
+     * 해당 예약 건과, 변경해야 하는 타입을 받아 예약 상태 변경 처리
+     */
+    @Transactional
+    public Reservation changeReservationStatus(
+            ReservationStatus status,
+            Long reservationId
+    ) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new CustomException(ErrorType.RESERVATION_NOT_FOUND));
+
+        reservation.setStatus(status);
+
+        return  reservation;
+    }
 }
