@@ -7,10 +7,7 @@ import archive.oxahex.domain.entity.Store;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -28,7 +25,7 @@ public class StoreController {
      * <p> 별점 순(RATING)
      */
     @GetMapping
-    public ResponseEntity<List<StoreDto.Info>> stores(
+    public ResponseEntity<List<StoreDto.Info>> getStores(
             @RequestParam(required = false) String sort
     ) {
 
@@ -38,5 +35,18 @@ public class StoreController {
                 .map(StoreDto::fromEntityToStoreInfo).toList();
 
         return ResponseEntity.ok().body(storeInfos);
+    }
+
+    /**
+     * 매장 상세 정보 조회
+     */
+    @GetMapping("/{storeId}")
+    public ResponseEntity<StoreDto.Detail> getStore(
+            @PathVariable Long storeId
+    ) {
+        Store store = storeService.getStore(storeId);
+        StoreDto.Detail storeDetail = StoreDto.fromEntityToStoreDetail(store);
+
+        return ResponseEntity.ok().body(storeDetail);
     }
 }

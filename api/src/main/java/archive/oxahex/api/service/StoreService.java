@@ -67,4 +67,12 @@ public class StoreService {
 
         return stores;
     }
+
+    /**
+     * 매장 상세 정보 조회
+     */
+    public Store getStore(Long storeId) {
+        return storeRepository.findById(storeId)
+                .orElseThrow(() -> new CustomException(ErrorType.STORE_NOT_FOUND));
+    }
 }
