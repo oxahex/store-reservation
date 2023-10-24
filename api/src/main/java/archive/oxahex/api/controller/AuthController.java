@@ -67,7 +67,7 @@ public class AuthController {
      * <p>파트너스 회원 등록 시, 응답으로 업데이트된 roleType이 포함된 유저 정보와 등록한 파트너스 정보를 반환한다.
      */
     @PostMapping("/partners")
-    @PreAuthorize("hasRole('USER') or hasRole('PARTNERS')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<PartnersDto.Response> joinPartners(
             Authentication auth, @RequestBody @Valid PartnersDto.Request request
     ) {

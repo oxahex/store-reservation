@@ -39,10 +39,14 @@ public class User extends BaseEntity {
     @Column(name = "registered_date")
     private LocalDateTime registeredDate;
 
-    @OneToMany(mappedBy = "user")
-    private List<Partners> partners = new ArrayList<>();
+    @OneToOne(mappedBy = "user")
+    private Partners partners;
 
     public void setRole(RoleType role) {
         this.role = role;
+    }
+
+    public void setPartners(Partners partners) {
+        this.partners = partners;
     }
 }

@@ -6,6 +6,7 @@ import archive.oxahex.api.exception.ErrorType;
 import archive.oxahex.api.exception.CustomException;
 import archive.oxahex.domain.entity.Partners;
 import archive.oxahex.domain.entity.Store;
+import archive.oxahex.domain.entity.User;
 import archive.oxahex.domain.repository.PartnersRepository;
 import archive.oxahex.domain.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,9 +29,9 @@ public class StoreService {
      * 매장을 등록할 파트너스와 매장 정보를 받아 매장을 저장
      */
     @Transactional
-    public Store registerStore(String partnersName, StoreDto.Request request) {
+    public Store registerStore(User user, StoreDto.Request request) {
 
-        Partners partners = partnersRepository.findByName(partnersName)
+        Partners partners = partnersRepository.findByUser(user)
                 .orElseThrow(() -> new CustomException(ErrorType.PARTNERS_NOT_FOUND));
 
         // 이미 등록된 매장인 경우

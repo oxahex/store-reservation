@@ -27,6 +27,29 @@ public class ReservationDto {
         private int useTableCount;
     }
 
+    @Getter
+    @Setter
+    public static class Info {
+        private Long id;
+        private String userName;
+        private String storeName;
+        private ReservationStatus status;
+        private LocalDateTime visitDate;
+        private Integer useTableCount;
+    }
+
+    public static ReservationDto.Info fromEntityToReservationInfo(Reservation reservation) {
+        ReservationDto.Info reservationInfo = new ReservationDto.Info();
+        reservationInfo.setId(reservation.getId());
+        reservationInfo.setUserName(reservation.getUser().getName());
+        reservationInfo.setStoreName(reservation.getStore().getName());
+        reservationInfo.setStatus(reservation.getStatus());
+        reservationInfo.setVisitDate(reservation.getVisitDate());
+        reservationInfo.setUseTableCount(reservation.getUseTableCount());
+
+        return reservationInfo;
+    }
+
     /**
      * 예약 내역 상세
      */
@@ -41,7 +64,6 @@ public class ReservationDto {
         private ReservationStatus status;
         private Integer useTableCount;
     }
-
 
     public static ReservationDto.Detail fromEntityToReservationDetail(Reservation reservation) {
 

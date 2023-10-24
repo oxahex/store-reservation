@@ -1,6 +1,7 @@
 package archive.oxahex.api.controller;
 
 import archive.oxahex.api.dto.PartnersDto;
+import archive.oxahex.api.dto.ReservationDto;
 import archive.oxahex.api.dto.StoreDto;
 import archive.oxahex.api.security.TokenProvider;
 import archive.oxahex.api.service.PartnersService;
@@ -8,6 +9,7 @@ import archive.oxahex.api.service.ReservationService;
 import archive.oxahex.api.service.StoreService;
 import archive.oxahex.api.service.AuthService;
 import archive.oxahex.domain.entity.Partners;
+import archive.oxahex.domain.entity.Reservation;
 import archive.oxahex.domain.entity.Store;
 import archive.oxahex.domain.entity.User;
 import jakarta.validation.Valid;
@@ -35,34 +37,37 @@ public class PartnersController {
     private final TokenProvider tokenProvider;
 
     /**
-     * 생성한 파트너스 전체 조회
-     * 유저가 생성한 파트너스 정보 전체 조회(매장 등록 시 사용)
+     * 파트너스 정보 조회
+     * 유저가 생성한 파트너스 정보 조회
      */
     @GetMapping
-    public ResponseEntity<List<PartnersDto.Info>> getAllPartners(Authentication auth) {
+    public ResponseEntity<PartnersDto.Detail> getPartners(Authentication auth) {
         User user = userService.loadUserByAuth(auth);
 
-        List<Partners> partnersList = partnersService.getAllPartners(user);
-        List<PartnersDto.Info> partnersInfos =
-                partnersList.stream().map(PartnersDto::fromEntityToPartnersInfo).toList();
+        Partners partners = partnersService.getPartners(user);
+        PartnersDto.Detail partnersDetail =
+                PartnersDto.fromEntityToPartnersDetail(partners, user);
 
-        return ResponseEntity.ok().body(partnersInfos);
+        return ResponseEntity.ok().body(partnersDetail);
     }
 
 
     /**
      * PARTNERS 회원인 경우 매장 등록
-     * 연결할 파트너스 정보와 매장 정보를 입력값으로 받음
+     * 매장 정보를 입력값으로 받음
      * 매장 등록 성공 시 등록 정보 반환
      */
-    @PostMapping("/{partnersName}/store")
+    @PostMapping("/store")
     public ResponseEntity<StoreDto.Info> registerStore(
-            @PathVariable String partnersName,
+            Authentication auth,
             @RequestBody @Valid StoreDto.Request request
     ) {
 
+        // 유저
+        User user = userService.loadUserByAuth(auth);
+
         // 등록한 매장 정보 데이터 받음
-        Store store = storeService.registerStore(partnersName, request);
+        Store store = storeService.registerStore(user, request);
         StoreDto.Info storeInfo = StoreDto.fromEntityToStoreInfo(store);
 
         // 매장 정보 반환
@@ -70,18 +75,23 @@ public class PartnersController {
     }
 
     /**
-     * 대기 상태 예약 목록 조회(파트너스 별 조회 x, 전체 조회)
-     * TODO: provider에서 파트너스 리스트를 꺼내 와도 괜찮을듯 굳이 매번 유저를 찾지 말고
+     * 대기 상태 예약 목록 조회(매장 별 조회 x, 전체 조회)
      */
     @GetMapping("/reservations")
-    public ResponseEntity<?> getAllPendingReservation(Authentication auth) {
+    public ResponseEntity<List<ReservationDto.Info>> getAllPendingReservation(Authentication auth) {
 
         User user = userService.loadUserByAuth(auth);
+        Partners partners = partnersService.getPartners(user);
 
         // 예약 상태 타입으로 조회할 수 있는 메서드를 만들고, 재사용하면?
+        List<Reservation> pendingReservations =
+                reservationService.getAllPendingReservations(partners);
 
-//        reservationService.getAllPendingReservations()
+        List<ReservationDto.Info> reservationInfos =
+                pendingReservations.stream()
+                        .map(ReservationDto::fromEntityToReservationInfo)
+                        .toList();
 
-        return null;
+        return ResponseEntity.ok().body(reservationInfos);
     }
 }

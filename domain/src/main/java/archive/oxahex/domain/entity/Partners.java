@@ -21,7 +21,7 @@ public class Partners extends BaseEntity {
     @Column(length = 100, unique = true)
     private String name;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -31,8 +31,8 @@ public class Partners extends BaseEntity {
 
     // 파트너스 생성 시 유저에 해당 파트너스 저장(리스트)
     public void setUser(User user) {
+        user.setPartners(this);
         this.user = user;
-        user.getPartners().add(this);
     }
 
 }
