@@ -128,9 +128,15 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new CustomException(ErrorType.RESERVATION_NOT_FOUND));
 
+        // 예약 상태 변경
         reservation.setStatus(status);
 
-        return  reservation;
+        // 예약 승인인 경우 해당 매장 좌석 감소
+        if (status == ReservationStatus.ALLOWED){
+            reservation.getStore().removeTableCount(reservation.getUseTableCount());
+        }
+
+        return reservation;
     }
 
 
