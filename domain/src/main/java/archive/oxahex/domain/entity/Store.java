@@ -49,9 +49,14 @@ public class Store extends BaseEntity {
         partners.getStores().add(this);
     }
 
-    // 예약 생성 시 테이블 수 감소 처리
+    // 예약 승인 시 테이블 수 감소 처리
     public void removeTableCount(int useTableCount) {
         this.tableCount -= useTableCount;
+    }
+
+    // 예약 취소 시 테이블 수 증가 처리
+    public void addTableCount(int useTableCount) {
+        this.tableCount += useTableCount;
     }
 
 }

@@ -143,6 +143,7 @@ public class ReservationService {
     /**
      * 예약 취소 기능
      * 예약 일자로부터 8시간 이전의 예약만 취소 가능
+     * 예약 취소 시 매장 테이블 수 원복 처리
      */
     @Transactional
     public Reservation cancelReservation(Long reservationId) {
@@ -150,13 +151,12 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new CustomException(ErrorType.RESERVATION_NOT_FOUND));
 
-        // 현재 시간에서 8시간을 뺀다 -> A
-        // 예약에 명시된 예약 일자 시간이 A보다 과거이면 취소 가능
-
+        // 8시간 조건 확인
         LocalDateTime cancellableTime = LocalDateTime.now().minusHours(8);
         if (cancellableTime.isAfter(reservation.getVisitDate())) {
 
             reservation.setStatus(ReservationStatus.CANCELLED);
+            reservation.getStore().addTableCount(reservation.getUseTableCount());
         } else {
             throw new CustomException(ErrorType.CANCELLABLE_TIME_OUT);
         }
