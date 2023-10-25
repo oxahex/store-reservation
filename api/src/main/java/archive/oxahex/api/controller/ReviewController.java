@@ -30,7 +30,7 @@ public class ReviewController {
      * 리뷰 작성
      * 예약 내역에서 이용이 확인된 경우에만 리뷰 작성 가능
      */
-    @PostMapping("/{reservationId}")
+    @PostMapping("/reservations/{reservationId}")
     public ResponseEntity<ReviewDto.Info> review(
             @PathVariable Long reservationId,
             @RequestBody @Valid ReviewDto.Request request

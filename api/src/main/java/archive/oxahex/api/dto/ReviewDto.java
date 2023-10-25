@@ -44,7 +44,7 @@ public class ReviewDto {
         ReviewDto.Info reviewInfo = new ReviewDto.Info();
         reviewInfo.setId(review.getId());
         reviewInfo.setUserName(review.getUser().getName());
-        reviewInfo.setUserName(review.getStore().getName());
+        reviewInfo.setStoreName(review.getStore().getName());
         reviewInfo.setRating(review.getRating());
         reviewInfo.setContent(review.getContent());
         reviewInfo.setCreatedDate(review.getCreatedDate());
