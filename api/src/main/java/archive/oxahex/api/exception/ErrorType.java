@@ -23,7 +23,11 @@ public enum ErrorType {
     INVALID_SEARCH_CONDITION(HttpStatus.BAD_REQUEST, "올바른 검색 조건이 아닙니다."),
     WRONG_PASSWORD(HttpStatus.UNAUTHORIZED, "패스워드가 일치하지 않습니다."),
     TABLE_SOLD_OUT(HttpStatus.BAD_REQUEST, "사용 가능한 테이블이 없습니다."),
-    CANCELLABLE_TIME_OUT(HttpStatus.CONFLICT, "예약 시간 8시간 전까지 취소가 가능합니다.");
+    CANCELLABLE_TIME_OUT(HttpStatus.CONFLICT, "예약 시간 8시간 전까지 취소가 가능합니다."),
+    TOO_LATE_TO_USE(HttpStatus.CONFLICT, "예약 시간 이후에 도착한 경우 매장 이용이 불가합니다."),
+    INVALID_RESERVATION(HttpStatus.CONFLICT, "유효한 예약이 아닙니다."),
+    INVALID_REVIEW_REQUEST(HttpStatus.CONFLICT, "매장을 이용한 경우에만 리뷰 작성이 가능합니다."),
+    ALREADY_REVIEW_STORE(HttpStatus.CONFLICT, "이미 해당 예약 건에 대해 리뷰를 작성하셨습니다.");
 
     private final HttpStatus httpStatus;
     private final String errorMessage;

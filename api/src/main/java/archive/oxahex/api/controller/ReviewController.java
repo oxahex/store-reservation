@@ -1,9 +1,11 @@
 package archive.oxahex.api.controller;
 
 import archive.oxahex.api.dto.ReviewDto;
+import archive.oxahex.api.service.AuthService;
 import archive.oxahex.api.service.ReviewService;
 import archive.oxahex.domain.entity.Review;
 
+import archive.oxahex.domain.entity.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,25 +24,25 @@ import java.util.List;
 public class ReviewController {
 
     private final ReviewService reviewService;
+    private final AuthService authService;
 
     /**
      * 리뷰 작성
      * 예약 내역에서 이용이 확인된 경우에만 리뷰 작성 가능
-     * TODO: 미작업
      */
-    @PostMapping("/{storeId}")
-    public Object addReview(
-            Authentication authentication,
-            @PathVariable Long storeId,
+    @PostMapping("/{reservationId}")
+    public ResponseEntity<ReviewDto.Info> review(
+            @PathVariable Long reservationId,
             @RequestBody @Valid ReviewDto.Request request
     ) {
+        Review review = reviewService.addReview(
+                reservationId, request.getRating(), request.getContent()
+        );
 
-        log.info("review auth={}", authentication.getAuthorities());
+        ReviewDto.Info reviewInfo =
+                ReviewDto.fromEntityToReviewInfo(review);
 
-        log.info("ReviewController.addReview request={}", request);
-        System.out.println(request.getContent());
-
-        return request;
+        return ResponseEntity.ok().body(reviewInfo);
     }
 
     /**

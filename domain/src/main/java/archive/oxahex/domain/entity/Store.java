@@ -30,9 +30,6 @@ public class Store extends BaseEntity {
     @Column(name = "table_count")
     private Integer tableCount;
 
-    @Column(columnDefinition = "decimal(2,1) default '0.0'")
-    private BigDecimal rating;
-
     @Column(name = "review_count", columnDefinition = "int default 0")
     private Integer reviewCount;
 
@@ -57,6 +54,11 @@ public class Store extends BaseEntity {
     // 예약 취소 시 테이블 수 증가 처리
     public void addTableCount(int useTableCount) {
         this.tableCount += useTableCount;
+    }
+
+    // 리뷰 개수 증가
+    public void increaseReviewCount() {
+        this.reviewCount++;
     }
 
 }

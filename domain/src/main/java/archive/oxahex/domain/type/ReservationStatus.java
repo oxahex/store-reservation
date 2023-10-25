@@ -13,7 +13,8 @@ public enum ReservationStatus {
     CANCELLED("cancelled"),
     ALLOWED("allowed"),
     REJECTED("rejected"),
-    CONFIRMED("confirmed");
+    CONFIRMED("confirmed"),
+    REVIEWED("reviewed");
 
     private final String status;
 

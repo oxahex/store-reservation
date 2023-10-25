@@ -2,6 +2,7 @@ package archive.oxahex.api.controller;
 
 import archive.oxahex.api.dto.ReservationDto;
 import archive.oxahex.api.dto.ReservationSearchType;
+import archive.oxahex.api.service.KioskService;
 import archive.oxahex.api.service.ReservationService;
 import archive.oxahex.api.service.AuthService;
 import archive.oxahex.domain.entity.Reservation;
@@ -24,6 +25,7 @@ public class ReservationController {
 
     private final AuthService userService;
     private final ReservationService reservationService;
+    private final KioskService kioskService;
 
     /**
      * 매장 예약 요청 기능
@@ -38,8 +40,6 @@ public class ReservationController {
         User user = userService.loadUserByAuth(auth);
         Reservation reservation =
                 reservationService.requestReservation(user, storeId, request);
-
-
 
         return ResponseEntity.ok().body(
                 ReservationDto.fromEntityToReservationDetail(reservation)
@@ -102,4 +102,21 @@ public class ReservationController {
 
         return ResponseEntity.ok().body(reservationDetail);
     }
+
+    /**
+     * 키오스크 입장 확인
+     * 도착 시간
+     */
+    @PostMapping("/{reservationId}/kiosk")
+    public ResponseEntity<ReservationDto.Info> confirmReservationKiosk(
+            @PathVariable Long reservationId
+    ) {
+        Reservation reservation = kioskService.checkStoreEntry(reservationId);
+
+        ReservationDto.Info reservationInfo =
+                ReservationDto.fromEntityToReservationInfo(reservation);
+
+        return ResponseEntity.ok().body(reservationInfo);
+    }
+
 }

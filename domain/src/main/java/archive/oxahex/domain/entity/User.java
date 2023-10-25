@@ -42,6 +42,9 @@ public class User extends BaseEntity {
     @OneToOne(mappedBy = "user")
     private Partners partners;
 
+    @OneToMany(mappedBy = "user")
+    private List<Reservation> reservations = new ArrayList<>();
+
     public void setRole(RoleType role) {
         this.role = role;
     }
