@@ -1,12 +1,16 @@
 package archive.oxahex.domain.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "review")
+@Getter
+@Setter
 @NoArgsConstructor
 public class Review extends BaseEntity {
 
