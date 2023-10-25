@@ -20,8 +20,10 @@ public enum ErrorType {
     BUSINESS_NUMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "등록되지 않은 사업자 번호입니다."),
     UN_MATCH_PARTNERS_USER(HttpStatus.FORBIDDEN, "본인의 사업자 번호가 아닙니다."),
     INVALID_SORT_TYPE(HttpStatus.BAD_REQUEST, "올바른 정렬 형식이 아닙니다."),
+    INVALID_SEARCH_CONDITION(HttpStatus.BAD_REQUEST, "올바른 검색 조건이 아닙니다."),
     WRONG_PASSWORD(HttpStatus.UNAUTHORIZED, "패스워드가 일치하지 않습니다."),
-    TABLE_SOLD_OUT(HttpStatus.BAD_REQUEST, "사용 가능한 테이블이 없습니다.");
+    TABLE_SOLD_OUT(HttpStatus.BAD_REQUEST, "사용 가능한 테이블이 없습니다."),
+    CANCELLABLE_TIME_OUT(HttpStatus.CONFLICT, "예약 시간 8시간 전까지 취소가 가능합니다.");
 
     private final HttpStatus httpStatus;
     private final String errorMessage;

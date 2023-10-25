@@ -1,6 +1,7 @@
 package archive.oxahex.api.service;
 
 import archive.oxahex.api.dto.ReservationDto;
+import archive.oxahex.api.dto.ReservationSearchType;
 import archive.oxahex.api.exception.CustomException;
 import archive.oxahex.api.exception.ErrorType;
 import archive.oxahex.domain.entity.Partners;
@@ -16,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,14 +68,33 @@ public class ReservationService {
      * 예약 대시/승인/거절 상태별로 조회 가능
      * status가 없는 경우 전체 조회 처리
      */
-    public List<Reservation> getAllReservations(ReservationStatus status) {
+    public List<Reservation> getAllReservations(
+            User user, ReservationSearchType searchType
+    ) {
 
+        List<Reservation> reservations;
+        if (searchType == ReservationSearchType.ALL) {
+            reservations = reservationRepository.findAllByUser(user);
+        } else {
+            ReservationStatus status = ReservationStatus.valueToEnum(searchType.getCondition())
+                    .orElseThrow(() -> new CustomException(ErrorType.INVALID_SEARCH_CONDITION));
+            reservations = reservationRepository.findAllByUserAndStatus(user, status);
+        }
 
-        return null;
+        return reservations;
     }
 
     /**
-     * 예약 대기 상태 목록 조회
+     * 특정 예약 건 정보 조회
+     */
+    public Reservation getReservation(Long reservationId) {
+
+        return reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new CustomException(ErrorType.RESERVATION_NOT_FOUND));
+    }
+
+    /**
+     * 예약 대기 상태 목록 조회(파트너스)
      * 등록한 파트너스로 매장 목록 반환 -> 전체 매장의 대기중 예약 목록 조회
      */
     public List<Reservation> getAllPendingReservations(Partners partners) {
@@ -110,5 +131,30 @@ public class ReservationService {
         reservation.setStatus(status);
 
         return  reservation;
+    }
+
+
+    /**
+     * 예약 취소 기능
+     * 예약 일자로부터 8시간 이전의 예약만 취소 가능
+     */
+    @Transactional
+    public Reservation cancelReservation(Long reservationId) {
+
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new CustomException(ErrorType.RESERVATION_NOT_FOUND));
+
+        // 현재 시간에서 8시간을 뺀다 -> A
+        // 예약에 명시된 예약 일자 시간이 A보다 과거이면 취소 가능
+
+        LocalDateTime cancellableTime = LocalDateTime.now().minusHours(8);
+        if (cancellableTime.isAfter(reservation.getVisitDate())) {
+
+            reservation.setStatus(ReservationStatus.CANCELLED);
+        } else {
+            throw new CustomException(ErrorType.CANCELLABLE_TIME_OUT);
+        }
+
+        return reservation;
     }
 }
