@@ -34,8 +34,8 @@ public class Reservation extends BaseEntity {
     @Column(name = "use_table_count")
     private Integer useTableCount;
 
-    public void setStore(Store store, int count) {
-        store.removeTableCount(count);
-        this.store = store;
-    }
+//    public void setStore(Store store, int count) {
+//        store.removeTableCount(count);
+//        this.store = store;
+//    }
 }
