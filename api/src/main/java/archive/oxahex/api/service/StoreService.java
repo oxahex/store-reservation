@@ -62,7 +62,7 @@ public class StoreService {
         List<Store> stores = null;
         switch (sortType) {
             case ASC -> stores = storeRepository.findAllByOrderByRegisteredDateAsc();
-            case RATING -> stores = storeRepository.findAllByOrderByRatingAsc();
+            case REVIEW_COUNT -> stores = storeRepository.findAllByOrderByReviewCountAsc();
         }
 
         return stores;

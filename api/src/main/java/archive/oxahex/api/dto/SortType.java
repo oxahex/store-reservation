@@ -12,7 +12,7 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public enum SortType {
     ASC("asc"),
-    RATING("rating");
+    REVIEW_COUNT("review_count");
 
     private final String condition;
 

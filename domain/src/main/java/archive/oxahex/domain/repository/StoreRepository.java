@@ -10,7 +10,7 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
 
     boolean existsByBusinessNumber(String businessNumber);
     List<Store> findAllByOrderByRegisteredDateAsc();
-    List<Store> findAllByOrderByRatingAsc();
+    List<Store> findAllByOrderByReviewCountAsc();
 
     List<Store> findAllByPartners(Partners partners);
 
