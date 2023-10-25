@@ -18,7 +18,7 @@ public enum SortType {
 
     public static SortType getSortType(String value) {
 
-        if (value == null) return SortType.ASC;
+        if (value == null || value.isEmpty()) return SortType.ASC;
 
         return Arrays.stream(SortType.values()).
                 filter(x -> x.getCondition().equals(value)).findAny()

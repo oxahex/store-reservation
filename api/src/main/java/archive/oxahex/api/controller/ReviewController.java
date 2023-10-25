@@ -16,6 +16,8 @@ import java.util.List;
 
 @Slf4j
 @RestController
+@RequestMapping("/reviews")
+@PreAuthorize("hasRole('USER') or hasRole('PARTNERS')")
 @RequiredArgsConstructor
 public class ReviewController {
 
@@ -26,8 +28,7 @@ public class ReviewController {
      * 예약 내역에서 이용이 확인된 경우에만 리뷰 작성 가능
      * TODO: 미작업
      */
-    @PostMapping("/reviews/{storeId}")
-    @PreAuthorize("hasRole('USER')")
+    @PostMapping("/{storeId}")
     public Object addReview(
             Authentication authentication,
             @PathVariable Long storeId,
@@ -46,7 +47,6 @@ public class ReviewController {
      * 특정 매장 리뷰 조회
      */
     @GetMapping("/{storeId}")
-    @PreAuthorize("hasRole('USER') or hasRole('PARTNERS')")
     public ResponseEntity<List<ReviewDto.Info>> getStoreReviews(
             @PathVariable Long storeId
     ) {

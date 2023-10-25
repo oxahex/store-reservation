@@ -21,7 +21,7 @@ public enum ReservationSearchType {
     private final String condition;
 
     public static ReservationSearchType getReservationSearchType(String value) {
-        if (value == null) return ReservationSearchType.ALL;
+        if (value == null || value.isEmpty()) return ReservationSearchType.ALL;
 
         return Arrays.stream(ReservationSearchType.values())
                 .filter(x -> Objects.equals(x.getCondition(), value)).findAny()
