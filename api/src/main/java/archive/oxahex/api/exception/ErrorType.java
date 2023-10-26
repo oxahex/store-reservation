@@ -27,7 +27,10 @@ public enum ErrorType {
     TOO_LATE_TO_USE(HttpStatus.CONFLICT, "예약 시간 이후에 도착한 경우 매장 이용이 불가합니다."),
     INVALID_RESERVATION(HttpStatus.CONFLICT, "유효한 예약이 아닙니다."),
     INVALID_REVIEW_REQUEST(HttpStatus.CONFLICT, "매장을 이용한 경우에만 리뷰 작성이 가능합니다."),
-    ALREADY_REVIEW_STORE(HttpStatus.CONFLICT, "이미 해당 예약 건에 대해 리뷰를 작성하셨습니다.");
+    ALREADY_REVIEW_STORE(HttpStatus.CONFLICT, "이미 해당 예약 건에 대해 리뷰를 작성하셨습니다."),
+    EXPIRED_JWT_TOKEN(HttpStatus.UNAUTHORIZED, "토큰이 만료되었습니다."),
+    INVALID_JWT_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
+    REDIS_CONNECTION_FAILURE(HttpStatus.INTERNAL_SERVER_ERROR, "Redis 연결에 실패했습니다.");
 
     private final HttpStatus httpStatus;
     private final String errorMessage;

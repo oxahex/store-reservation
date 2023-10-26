@@ -1,11 +1,15 @@
 package archive.oxahex.api.security;
 
+import archive.oxahex.api.exception.CustomException;
+import archive.oxahex.api.exception.ErrorType;
+import archive.oxahex.api.utils.RedisUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,16 +18,29 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+
 import java.util.List;
+
+
+/**
+ * JWTFilter
+ * <ul>
+ *     <li>request 객체로부터 토큰을 받아와 정상 토큰인 경우 security context에 저장 </li>
+ *     <li>Access Token 만료이나 Refresh Token이 있는 경우 Refresh Token 정보를 토대로 AccessToken 재발급</li>
+ * </ul>
+ */
 
 @Slf4j
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 
-    public static final String TOKEN_HEADER = "Authorization";
-    public static final String TOKEN_PREFIX = "Bearer ";
+    private static final String TOKEN_HEADER = "Authorization";
+    private static final String TOKEN_PREFIX = "Bearer ";
 
-    public final TokenProvider tokenProvider;
+    private static final List<String> WHITE_LIST = List.of("/auth/signin");
+
+    private final TokenProvider tokenProvider;
+    private final RedisUtil redisUtil;
 
 
     @Override
@@ -33,33 +50,56 @@ public class JwtFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
-        // Token에서 Email과 권한을 꺼냄
-        String accessToken = this.resolveTokenFromRequest(request);
-        log.info("Authentication : {}", accessToken);
+        // 요청 URI가 인증하지 않아도 되는 URI인 경우
+        String requestURI = request.getRequestURI();
+        boolean noNeedToCheck = WHITE_LIST.contains(requestURI);
 
-        // Header에서 가져온 Token이 없거나 유효하지 않은 경우
-        if (accessToken == null ||!tokenProvider.validateToken(accessToken)) {
+        if (noNeedToCheck) {
+            // Filter Chain 넘김
             filterChain.doFilter(request, response);
             return;
         }
 
-        String email = tokenProvider.getUserEmail(accessToken);
-        String role = tokenProvider.getUserRole(accessToken);
+        // Token에서 Email과 권한을 꺼냄
+        String accessToken = this.resolveTokenFromRequest(request);
 
-        // 권한 부여
+        AuthUser authUser = tokenProvider.getAuthUser(accessToken);
+
+        // Access Token 있고 인증된 유저
+         if (!tokenProvider.validateToken(accessToken)) {
+             // Refresh Token 있으면 재발급
+             String refreshToken = redisUtil.get(authUser.getEmail());
+
+             if (tokenProvider.validateToken(refreshToken)) {
+                 log.info("refreshToken={}", refreshToken);
+                 AuthUser authUserFromRefreshToken = tokenProvider.getAuthUser(refreshToken);
+                 String reIssuedAccessToken = tokenProvider.generateAccessToken(authUserFromRefreshToken);
+                 response.setHeader("Authorization", reIssuedAccessToken);
+             } else {
+                 throw new CustomException(ErrorType.EXPIRED_JWT_TOKEN);
+             }
+        }
+
+
+        // Filter Chain 넘김
+        // Username 객체 생성
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(
-                        email,
+                        authUser,
                         null,
-                        List.of(new SimpleGrantedAuthority(role))
+                        List.of(new SimpleGrantedAuthority(authUser.getRole()))
                 );
 
-        // Detail: 인증 된 유저로 넘김
+        // 인증된 유저로 넘김
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
         filterChain.doFilter(request, response);
     }
 
+    /**
+     * request 객체에서 Authorization Header 값 파싱해 JWT String만 반환
+     */
     private String resolveTokenFromRequest(HttpServletRequest request) {
 
         String token = request.getHeader(TOKEN_HEADER);

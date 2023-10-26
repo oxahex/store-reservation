@@ -33,7 +33,7 @@ public class AuthService {
      */
     public User loadUserByAuth(Authentication auth) {
 
-        log.info("auth.name={}", auth.getName());
+        log.info("auth.email={}", auth.getName());
         return userRepository.findByEmail(auth.getName())
                 .orElseThrow(() -> new CustomException(ErrorType.USER_NOT_FOUND));
     }

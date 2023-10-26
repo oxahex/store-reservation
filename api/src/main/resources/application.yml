@@ -6,10 +6,6 @@ spring:
   messages:
     basename: messages
     encoding: utf-8
-  data:
-    redis:
-      host: host.docker.internal
-      port: 6379
 server:
   port: 8080
 
