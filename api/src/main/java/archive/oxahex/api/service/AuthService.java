@@ -29,7 +29,7 @@ public class AuthService {
     private final PartnersRepository partnersRepository;
 
     /**
-     * email로 유저를 찾음
+     *
      */
     public User loadUserByAuth(Authentication auth) {
 
@@ -39,10 +39,14 @@ public class AuthService {
     }
 
 
-
     /**
      * 유저 생성
-     * <p>새 유저 정보를 DB에 저장하고, 유저의 정보를 반환합니다.
+     * <ol>
+     *     <li>새 유저 정보를 DB에 저장합니다.</li>
+     *     <li>유저 비밀번호는 암호화 되어 저장됩니다.</li>
+     * </ol>
+     * @param request username, password, email, phoneNumber
+     * @return 생성된 User Entity 객체
      */
     @Transactional
     public User createUser(SignUpDto.Request request) {
@@ -65,15 +69,19 @@ public class AuthService {
 
     /**
      * 파트너스 등록
-     * <p>등록 조건은 따로 없음(현재 로그인이 확인되는 경우)
-     * <p>파트너스 테이블에 해당 파트너스 저장
-     * <p>파트너스 등록 시 해당 유저의 Role Type 변경 후 업데이트 된 권한 정보 반환
+     * <ol>
+     *     <li>ROLE_USER의 경우 파트너스로 등록 가능합니다.</li>
+     *     <li>파트너스 이름은 중복될 수 없습니다.</li>
+     * </ol>
+     * @param user 로그인 유저 객체
+     * @param partnersName 파트너스 이름
+     * @return 생성된 파트너스 객체
      */
     @Transactional
-    public Partners createPartners(User user, String name) {
+    public Partners createPartners(User user, String partnersName) {
 
         // 이미 등록된 이름인지 검증
-        boolean exists = partnersRepository.existsByName(name);
+        boolean exists = partnersRepository.existsByName(partnersName);
         if (exists) {
             throw new CustomException(ErrorType.ALREADY_EXIST_PARTNERS_NAME);
         }
@@ -82,7 +90,7 @@ public class AuthService {
         user.setRole(RoleType.ROLE_PARTNERS);
 
         Partners partners = new Partners();
-        partners.setName(name);
+        partners.setName(partnersName);
         partners.setUser(user);
 
         // 파트너스 등록
@@ -90,8 +98,14 @@ public class AuthService {
     }
 
     /**
-     * 유저가 입력한 email, password로 인증 작업
-     * <p>인증이 완료되면 인증 완료 된 유저 정보 반환
+     * 유저 email, password 일치 여부 확인
+     * <ol>
+     *     <li>유저가 입력한 email, password로 가입된 사용자인지 확인합니다.</li>
+     *     <li>인증이 성공적으로 수행되면, 인증 완료 된 유저 정보를 반환합니다.</li>
+     * </ol>
+     * @param email 유저 이메일
+     * @param password 유저 비밀번호
+     * @return 인증된 유저 Entity 반환
      */
     public User authenticate(String email, String password) {
 

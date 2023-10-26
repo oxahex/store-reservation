@@ -28,13 +28,15 @@ public class AuthController {
 
     private final AuthService userService;
     private final TokenProvider tokenProvider;
-    private final RedisUtil redisUtil;
-
 
     /**
      * 회원 가입 기능
-     * <p>최초 회원 가입 시 모든 유저는 ROLE_USER 로 정의합니다.
-     * <p>이후 파트너스 회원 가입 시 ROLE_PARTNERS 로 전환됩니다.
+     * <ol>
+     *     <li>최초 회원 가입 시 모든 유저는 ROLE_USER 권한을 갖습니다.</li>
+     *     <li>이후 파트너스 회원 가입 시 ROLE_PARTNERS 권한으로 전환됩니다.</li>
+     * </ol>
+     * @param request username, password, email, phoneNumber
+     * @return 해당 유저 요약 데이터
      */
     @PostMapping("/signup")
     public ResponseEntity<UserDto.Info> signUp(
@@ -46,10 +48,13 @@ public class AuthController {
 
     /**
      * 회원 로그인
-     * <p>유저의 email, password 정보를 받음.
-     * <p>가입된 유저인지 검증하고,
-     * <p>정상적으로 인증된 유저의 경우 JWT Token 발급
-     * <p>유저 DB에 저장된 Role Type(권한)이 JWT 토큰에 포함된다.
+     * <ol>
+     *     <li>비밀번호와 이메일로 가입된 유저인지 검증합니다.</li>
+     *     <li>정상적으로 인증된 유저의 경우 JWT Token을 발급합니다.</li>
+     *     <li>JWT Token은 Authrization Header로 전송되고, 응답으로도 전송됩니다.</li>
+     * </ol>
+     * @param request email, password
+     * @return 유저 정보 요약(info), jwt token
      */
     @PostMapping("/signin")
     public ResponseEntity<SignInDto.Response> signIn(
@@ -74,8 +79,13 @@ public class AuthController {
 
     /**
      * 파트너스 등록
-     * <p>로그인한 회원인 경우 파트너스 회원 신청을 할 수 있다.
-     * <p>파트너스 회원 등록 시, 응답으로 업데이트된 roleType이 포함된 유저 정보와 등록한 파트너스 정보를 반환한다.
+     * <ol>
+     *     <li>로그인 회원인 경우 파트너스 회원 신청이 가능합니다.</li>
+     *     <li>파트너스 회원 등록 시 응답으로 업데이트 된 RoleType이 포함된 유저 정보와 등록한 파트너스 정보를 반환합니다.</li>
+     * </ol>
+     * @param auth 로그인 유저 객체
+     * @param request 파트너스 이름
+     * @return 등록한 파트너스 정보, 새로 발급된 JWT Token
      */
     @PostMapping("/partners")
     @PreAuthorize("hasRole('USER')")
