@@ -4,12 +4,15 @@ import archive.oxahex.api.dto.PartnersDto;
 import archive.oxahex.api.dto.SignInDto;
 import archive.oxahex.api.dto.SignUpDto;
 import archive.oxahex.api.dto.UserDto;
+import archive.oxahex.api.security.AuthUser;
 import archive.oxahex.api.security.TokenProvider;
 import archive.oxahex.api.service.AuthService;
+import archive.oxahex.api.utils.RedisUtil;
 import archive.oxahex.domain.entity.Partners;
 import archive.oxahex.domain.entity.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -25,6 +28,8 @@ public class AuthController {
 
     private final AuthService userService;
     private final TokenProvider tokenProvider;
+    private final RedisUtil redisUtil;
+
 
     /**
      * 회원 가입 기능
@@ -52,13 +57,19 @@ public class AuthController {
     ) {
 
         User verifiedUser = userService.authenticate(request.getEmail(), request.getPassword());
-        String token = tokenProvider.generateToken(verifiedUser.getId(), verifiedUser.getEmail(), verifiedUser.getRole());
+
+        // Access Token 발급
+        String accessToken = tokenProvider.generateAccessToken(AuthUser.fromEntityToAuthUser(verifiedUser));
+        // Refresh Token Redis 저장
+        tokenProvider.generateRefreshToken(verifiedUser);
 
         SignInDto.Response signInResponse =
-                SignInDto.fromEntityToSignInResponse(verifiedUser, token);
+                SignInDto.fromEntityToSignInResponse(verifiedUser, accessToken);
 
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", accessToken);
 
-        return ResponseEntity.ok().body(signInResponse);
+        return ResponseEntity.ok().headers(headers).body(signInResponse);
     }
 
     /**
@@ -75,14 +86,17 @@ public class AuthController {
         User user = userService.loadUserByAuth(auth);
         Partners partners = userService.createPartners(user, request.getName());
 
-        String token = tokenProvider.generateToken(
-                user.getId(), user.getEmail(), user.getRole()
-        );
+        // 새 Access Token 발급
+        String accessToken = tokenProvider.generateAccessToken(AuthUser.fromEntityToAuthUser(user));
+        // 기존 Refresh Token 업데이트
+        tokenProvider.generateRefreshToken(user);
 
         PartnersDto.Response partnersResponse =
-                PartnersDto.fromEntityToPartnersResponse(user, partners, token);
+                PartnersDto.fromEntityToPartnersResponse(user, partners, accessToken);
 
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", accessToken);
 
-        return ResponseEntity.ok().body(partnersResponse);
+        return ResponseEntity.ok().headers(headers).body(partnersResponse);
     }
 }

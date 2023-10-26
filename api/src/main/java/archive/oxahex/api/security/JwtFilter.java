@@ -37,10 +37,9 @@ public class JwtFilter extends OncePerRequestFilter {
     private static final String TOKEN_HEADER = "Authorization";
     private static final String TOKEN_PREFIX = "Bearer ";
 
-    private static final List<String> WHITE_LIST = List.of("/auth/signin");
+    private static final List<String> WHITE_LIST = List.of("/auth/signup", "/auth/signin");
 
     private final TokenProvider tokenProvider;
-    private final RedisUtil redisUtil;
 
 
     @Override
@@ -54,8 +53,10 @@ public class JwtFilter extends OncePerRequestFilter {
         String requestURI = request.getRequestURI();
         boolean noNeedToCheck = WHITE_LIST.contains(requestURI);
 
+        log.info("noNeddToCheck={}", requestURI);
         if (noNeedToCheck) {
             // Filter Chain 넘김
+            log.info("noNeddToCheck={}", requestURI);
             filterChain.doFilter(request, response);
             return;
         }
@@ -68,7 +69,7 @@ public class JwtFilter extends OncePerRequestFilter {
         // Access Token 있고 인증된 유저
          if (!tokenProvider.validateToken(accessToken)) {
              // Refresh Token 있으면 재발급
-             String refreshToken = redisUtil.get(authUser.getEmail());
+             String refreshToken = tokenProvider.getRefreshToken(authUser.getEmail());
 
              if (tokenProvider.validateToken(refreshToken)) {
                  log.info("refreshToken={}", refreshToken);

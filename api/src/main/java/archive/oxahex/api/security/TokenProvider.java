@@ -54,11 +54,6 @@ public class TokenProvider {
 
         log.info("TokenProvider generateRefreshToken user.email = {}", user.getEmail());
 
-        // 기존에 Redis에 있으면 삭제
-        if (redisUtil.get(user.getEmail()) != null) {
-            redisUtil.delete(user.getEmail());
-        }
-
         Claims claims = Jwts.claims().setSubject(user.getEmail());
         claims.put(KEY_EMAIL, user.getEmail());
         claims.put(KEY_ID, user.getId());
@@ -78,6 +73,10 @@ public class TokenProvider {
         redisUtil.set(user.getEmail(), refreshToken);
 
         return refreshToken;
+    }
+
+    public String getRefreshToken(String key) {
+        return redisUtil.get(key);
     }
 
     public AuthUser getAuthUser(String token) {

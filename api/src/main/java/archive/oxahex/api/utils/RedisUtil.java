@@ -17,6 +17,9 @@ public class RedisUtil {
 
     @Transactional
     public void set(String key, String value) {
+        // 기존에 있으면 제거
+        if (get(key) != null) delete(key);
+
         log.info("RedisUtil set key={}, value={}", key, value);
         redisTemplate.opsForValue().set(
                 key, value, REFRESH_TOKEN_EXPIRE_TIME, TimeUnit.MILLISECONDS
