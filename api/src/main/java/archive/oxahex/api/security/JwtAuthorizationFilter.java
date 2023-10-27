@@ -78,6 +78,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             log.info("refreshToken from Redis={}", refreshToken);
 
             // Refresh Token 없는 경우 Authentication 없이 리턴(진행)
+            // 재 로그인 필요
             if (refreshToken == null) {
                 chain.doFilter(request, response);
             }
