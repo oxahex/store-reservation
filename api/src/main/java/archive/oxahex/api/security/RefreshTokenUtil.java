@@ -1,4 +1,4 @@
-package archive.oxahex.api.utils;
+package archive.oxahex.api.security;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class RedisUtil {
+public class RefreshTokenUtil {
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24;   // 24h
     private final RedisTemplate<String, String> redisTemplate;
 
@@ -20,7 +20,7 @@ public class RedisUtil {
         // 기존에 있으면 제거
         if (get(key) != null) delete(key);
 
-        log.info("RedisUtil set key={}, value={}", key, value);
+        log.info("[RefreshTokenRedisHandler.set] key={}, value={}", key, value);
         redisTemplate.opsForValue().set(
                 key, value, REFRESH_TOKEN_EXPIRE_TIME, TimeUnit.MILLISECONDS
         );

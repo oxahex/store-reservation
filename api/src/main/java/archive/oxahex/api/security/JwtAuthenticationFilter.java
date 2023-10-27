@@ -78,7 +78,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
      * JWT Token 발급
      * <ol>
      *     <li>JWT Access Token 발급</li>
+     *     <li>JWT Refresh Token 발급</li>
      *     <li>Response Header에 Access Token 전송</li>
+     *     <li>Refresh Token은 Redis에 저장, 응답 Header로 전송하지 않음</li>
      * </ol>
      */
     @Override
@@ -91,6 +93,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         AuthUser authUser = (AuthUser) authResult.getPrincipal();
         String accessToken = tokenProvider.generateAccessToken(authUser);
+        tokenProvider.generateRefreshToken(authUser);
 
         response.addHeader(TOKEN_HEADER, TOKEN_PREFIX + accessToken);
     }

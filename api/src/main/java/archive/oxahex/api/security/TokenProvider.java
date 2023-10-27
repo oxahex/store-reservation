@@ -1,14 +1,11 @@
 package archive.oxahex.api.security;
 
-import archive.oxahex.api.utils.RedisUtil;
-import archive.oxahex.domain.entity.User;
 import io.jsonwebtoken.*;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import java.util.Date;
 
@@ -17,7 +14,7 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class TokenProvider {
 
-    private final RedisUtil redisUtil;
+    private final RefreshTokenUtil refreshTokenRedisHandler;
     private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 60;   // 1h
 //    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60;   // 1분 test
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24;   // 24h
@@ -68,13 +65,13 @@ public class TokenProvider {
                 .compact();
 
         // 새 Token Redis 저장
-        redisUtil.set(authUser.getUsername(), refreshToken);
+        refreshTokenRedisHandler.set(authUser.getUsername(), refreshToken);
 
         return refreshToken;
     }
 
     public String getRefreshToken(String key) {
-        return redisUtil.get(key);
+        return refreshTokenRedisHandler.get(key);
     }
 
     /**

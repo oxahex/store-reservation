@@ -62,7 +62,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
         String accessToken = resolveTokenFromRequest(request);
 
-        // AccessToken이 없으면 리턴
+        // Access Token이 없으면 리턴
         if (accessToken == null) {
             log.info("[JwtAuthorizationFilter] 토큰이 없음");
             chain.doFilter(request, response);
@@ -71,13 +71,36 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         // 유효하지 않음(기간 지남) 경우 따로 처리
         if (!tokenProvider.validateToken(accessToken)) {
             log.info("[JwtAuthorizationFilter] 유효하지 않은 토큰={}", accessToken);
-            // TODO: 일단 반환하고 후에 Refresh Token 이용 방식으로 전환
-            chain.doFilter(request, response);
+
+            // Redis에서 username(email)로 저장된 Refresh Token이 있는지 확인
+            String email = tokenProvider.getTokenSubject(accessToken);
+            String refreshToken = tokenProvider.getRefreshToken(email);
+            log.info("refreshToken from Redis={}", refreshToken);
+
+            // Refresh Token 없는 경우 Authentication 없이 리턴(진행)
+            if (refreshToken == null) {
+                chain.doFilter(request, response);
+            }
+
+            // Refresh Token 있는 경우 검증하고, 새 Access Token 발급
+            if (tokenProvider.validateToken(refreshToken)) {
+                String username = tokenProvider.getTokenSubject(refreshToken);
+                AuthUser authUser = (AuthUser) authService.loadUserByUsername(username);
+
+                String reIssuedAccessToken = tokenProvider.generateAccessToken(authUser);
+                log.info("[AccessToken 재발급] Access Token={}", reIssuedAccessToken);
+
+                // 새로 발급된 Access Token 응답 Header에 삽입
+                response.setHeader(TOKEN_HEADER, TOKEN_PREFIX + reIssuedAccessToken);
+
+                // 새로 발급된 Access Token으로 기존 Access Token 교체
+                accessToken = reIssuedAccessToken;
+            }
         }
 
         // 유효한 경우 Authentication 객체 생성 후 Security Session에 객체를 등록
-        String email = tokenProvider.getTokenSubject(accessToken);
-        AuthUser authUser = (AuthUser) authService.loadUserByUsername(email);
+        String username = tokenProvider.getTokenSubject(accessToken);
+        AuthUser authUser = (AuthUser) authService.loadUserByUsername(username);
 
         // 인증된 Authentication 객체
         Authentication authentication =
