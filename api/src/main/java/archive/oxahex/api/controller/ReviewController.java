@@ -5,13 +5,12 @@ import archive.oxahex.api.service.AuthService;
 import archive.oxahex.api.service.ReviewService;
 import archive.oxahex.domain.entity.Review;
 
-import archive.oxahex.domain.entity.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -53,6 +52,7 @@ public class ReviewController {
             @PathVariable Long storeId
     ) {
 
+        log.info("Review 조회");
         List<Review> reviews = reviewService.getAllReviews(storeId);
         List<ReviewDto.Info> reviewInfos = reviews.stream()
                 .map(ReviewDto::fromEntityToReviewInfo).toList();

@@ -18,8 +18,8 @@ import java.util.Date;
 public class TokenProvider {
 
     private final RedisUtil redisUtil;
-//    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 60;   // 1h
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60;   // 1분 test
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 60;   // 1h
+//    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60;   // 1분 test
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24;   // 24h
 
     private static final String KEY_EMAIL = "email";
@@ -34,10 +34,9 @@ public class TokenProvider {
      * <p>id, email, role 정보 포함
      */
     public String generateAccessToken(AuthUser authUser) {
-        Claims claims = Jwts.claims().setSubject(authUser.getEmail());
-        claims.put(KEY_EMAIL, authUser.getEmail());
-        claims.put(KEY_ID, authUser.getId());
-        claims.put(KEY_ROLE, authUser.getRole());
+        log.info("TokenProvider generateAccessToken user.email = {}", authUser.getUsername());
+        Claims claims = Jwts.claims().setSubject(authUser.getUsername());
+        claims.put(KEY_ID, authUser.getUser().getId());
 
         Date now = new Date(System.currentTimeMillis());
         Date expiredDate = new Date(now.getTime() + ACCESS_TOKEN_EXPIRE_TIME);
@@ -50,14 +49,13 @@ public class TokenProvider {
                 .compact();
     };
 
-    public String generateRefreshToken(User user) {
+    public String generateRefreshToken(AuthUser authUser) {
 
-        log.info("TokenProvider generateRefreshToken user.email = {}", user.getEmail());
+        log.info("TokenProvider generateRefreshToken user.email = {}", authUser.getUsername());
 
-        Claims claims = Jwts.claims().setSubject(user.getEmail());
-        claims.put(KEY_EMAIL, user.getEmail());
-        claims.put(KEY_ID, user.getId());
-        claims.put(KEY_ROLE, user.getRole());
+        Claims claims = Jwts.claims().setSubject(authUser.getUsername());
+        claims.put(KEY_ID, authUser.getUser().getId());
+
 
         Date now = new Date();
         Date expireDate = new Date(now.getTime() + REFRESH_TOKEN_EXPIRE_TIME);
@@ -70,7 +68,7 @@ public class TokenProvider {
                 .compact();
 
         // 새 Token Redis 저장
-        redisUtil.set(user.getEmail(), refreshToken);
+        redisUtil.set(authUser.getUsername(), refreshToken);
 
         return refreshToken;
     }
@@ -79,26 +77,29 @@ public class TokenProvider {
         return redisUtil.get(key);
     }
 
-    public AuthUser getAuthUser(String token) {
+    /**
+     * Token으로부터 Email(Username)을 꺼냄
+     */
+    public String getTokenSubject(String token) {
         Claims claims = parseClaims(token);
-
-        String email = claims.get(KEY_EMAIL, String.class);
-        Long id = claims.get(KEY_ID, Long.class);
-        String role = claims.get(KEY_ROLE, String.class);
-
-        return new AuthUser(id, email, role);
+        return claims.getSubject();
     }
 
-    public boolean validateToken(String token) {
-        log.info("token={}", token);
-        if (!StringUtils.hasText(token)) return false;
 
+    /**
+     * 토큰 유효기간 확인
+     * @param token
+     * @return 유효한 경우 true, 유효 기간 만료 토큰인 경우 false
+     */
+    public boolean validateToken(String token) {
         Claims claims = this.parseClaims(token);
         return !claims.getExpiration().before(new Date());
     }
 
+    /**
+     * Claim의 Body를 파싱
+     */
     private Claims parseClaims(String token) {
-
         try {
             return Jwts.parserBuilder()
                     .setSigningKey(this.key)

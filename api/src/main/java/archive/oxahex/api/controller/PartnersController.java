@@ -3,6 +3,7 @@ package archive.oxahex.api.controller;
 import archive.oxahex.api.dto.PartnersDto;
 import archive.oxahex.api.dto.ReservationDto;
 import archive.oxahex.api.dto.StoreDto;
+import archive.oxahex.api.security.AuthUser;
 import archive.oxahex.api.security.TokenProvider;
 import archive.oxahex.api.service.PartnersService;
 import archive.oxahex.api.service.ReservationService;
@@ -19,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,20 +32,19 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PartnersController {
 
-    private final AuthService userService;
     private final StoreService storeService;
     private final PartnersService partnersService;
     private final ReservationService reservationService;
-
-    private final TokenProvider tokenProvider;
 
     /**
      * 파트너스 정보 조회
      * 유저가 생성한 파트너스 정보 조회
      */
     @GetMapping
-    public ResponseEntity<PartnersDto.Detail> getPartners(Authentication auth) {
-        User user = userService.loadUserByAuth(auth);
+    public ResponseEntity<PartnersDto.Detail> getPartners() {
+
+        AuthUser authUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = authUser.getUser();
 
         Partners partners = partnersService.getPartners(user);
         PartnersDto.Detail partnersDetail =
@@ -60,12 +61,12 @@ public class PartnersController {
      */
     @PostMapping("/store")
     public ResponseEntity<StoreDto.Info> registerStore(
-            Authentication auth,
             @RequestBody @Valid StoreDto.Request request
     ) {
 
         // 유저
-        User user = userService.loadUserByAuth(auth);
+        AuthUser authUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = authUser.getUser();
 
         // 등록한 매장 정보 데이터 받음
         Store store = storeService.registerStore(user, request);
@@ -79,9 +80,11 @@ public class PartnersController {
      * 대기 상태 예약 목록 조회(매장 별 조회 x, 전체 조회)
      */
     @GetMapping("/reservations")
-    public ResponseEntity<List<ReservationDto.Info>> getAllPendingReservation(Authentication auth) {
+    public ResponseEntity<List<ReservationDto.Info>> getAllPendingReservation() {
 
-        User user = userService.loadUserByAuth(auth);
+        AuthUser authUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = authUser.getUser();
+
         Partners partners = partnersService.getPartners(user);
 
         // 예약 상태 타입으로 조회할 수 있는 메서드를 만들고, 재사용하면?

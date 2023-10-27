@@ -4,6 +4,7 @@ import archive.oxahex.api.dto.SignUpDto;
 import archive.oxahex.api.exception.ErrorType;
 import archive.oxahex.api.exception.CustomException;
 
+import archive.oxahex.api.security.AuthUser;
 import archive.oxahex.domain.entity.Partners;
 import archive.oxahex.domain.entity.User;
 import archive.oxahex.domain.repository.PartnersRepository;
@@ -12,6 +13,10 @@ import archive.oxahex.domain.type.RoleType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,22 +27,23 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class AuthService {
+public class AuthService implements UserDetailsService {
 
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final UserRepository userRepository;
     private final PartnersRepository partnersRepository;
 
-    /**
-     *
-     */
-    public User loadUserByAuth(Authentication auth) {
+    @Override
+    public UserDetails loadUserByUsername(
+            String username
+    ) throws UsernameNotFoundException {
 
-        log.info("auth.email={}", auth.getName());
-        return userRepository.findByEmail(auth.getName())
+        log.info("AuthService.loadUserByUsername={}", username);
+        User user = userRepository.findByEmail(username)
                 .orElseThrow(() -> new CustomException(ErrorType.USER_NOT_FOUND));
-    }
 
+        return new AuthUser(user);
+    }
 
     /**
      * 유저 생성
@@ -51,8 +57,10 @@ public class AuthService {
     @Transactional
     public User createUser(SignUpDto.Request request) {
 
+        log.info("[createUser] email={}, password={}", request.getEmail(), request.getPassword());
         boolean exists = userRepository.existsByEmail(request.getEmail());
         if (exists) {
+            log.info("이미 있음");
             throw new CustomException(ErrorType.ALREADY_EXIST_USER);
         }
 
@@ -95,29 +103,5 @@ public class AuthService {
 
         // 파트너스 등록
         return partnersRepository.save(partners);
-    }
-
-    /**
-     * 유저 email, password 일치 여부 확인
-     * <ol>
-     *     <li>유저가 입력한 email, password로 가입된 사용자인지 확인합니다.</li>
-     *     <li>인증이 성공적으로 수행되면, 인증 완료 된 유저 정보를 반환합니다.</li>
-     * </ol>
-     * @param email 유저 이메일
-     * @param password 유저 비밀번호
-     * @return 인증된 유저 Entity 반환
-     */
-    public User authenticate(String email, String password) {
-
-        // 인증 처리
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new CustomException(ErrorType.USER_NOT_FOUND));
-
-        // 비밀 번호 확인
-        if (!this.passwordEncoder.matches(password, user.getPassword())) {
-            throw new CustomException(ErrorType.WRONG_PASSWORD);
-        }
-
-        return user;
     }
 }

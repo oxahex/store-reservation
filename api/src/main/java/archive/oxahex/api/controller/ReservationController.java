@@ -2,6 +2,7 @@ package archive.oxahex.api.controller;
 
 import archive.oxahex.api.dto.ReservationDto;
 import archive.oxahex.api.dto.ReservationSearchType;
+import archive.oxahex.api.security.AuthUser;
 import archive.oxahex.api.service.KioskService;
 import archive.oxahex.api.service.ReservationService;
 import archive.oxahex.api.service.AuthService;
@@ -12,7 +13,7 @@ import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,7 +24,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReservationController {
 
-    private final AuthService userService;
     private final ReservationService reservationService;
     private final KioskService kioskService;
 
@@ -32,12 +32,13 @@ public class ReservationController {
      */
     @PostMapping("/{storeId}")
     public ResponseEntity<ReservationDto.Detail> requestReservation(
-            Authentication auth,
             @PathVariable Long storeId,
             @RequestBody @Valid ReservationDto.Request request
     ) {
 
-        User user = userService.loadUserByAuth(auth);
+        AuthUser authUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = authUser.getUser();
+
         Reservation reservation =
                 reservationService.requestReservation(user, storeId, request);
 
@@ -53,10 +54,10 @@ public class ReservationController {
      */
     @GetMapping
     public ResponseEntity<List<ReservationDto.Info>> getReservations(
-            Authentication auth,
             @PathParam("status") String status
     ) {
-        User user = userService.loadUserByAuth(auth);
+        AuthUser authUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = authUser.getUser();
 
         ReservationSearchType searchType =
                 ReservationSearchType.getReservationSearchType(status);
