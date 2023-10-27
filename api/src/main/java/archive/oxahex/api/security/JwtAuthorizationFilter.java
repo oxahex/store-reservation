@@ -51,6 +51,10 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         return Arrays.stream(EXCLUDE_PATH).anyMatch(path::startsWith);
     }
 
+    /**
+     * JWT Access Token 유효성 검증 및 Refresh Token 있는 경우 Access Token 갱신
+     * @param request HTTP Request
+     */
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
@@ -115,6 +119,11 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         chain.doFilter(request, response);
     }
 
+    /**
+     * 요청으로부터 JWT Token 파싱
+     * @param request 요청
+     * @return JWT Token
+     */
     private String resolveTokenFromRequest(HttpServletRequest request) {
 
         String token = request.getHeader(TOKEN_HEADER);
