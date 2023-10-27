@@ -1,7 +1,5 @@
 package archive.oxahex.api.configuration;
 
-import archive.oxahex.api.handler.JwtAccessDeniedHandler;
-import archive.oxahex.api.handler.JwtAuthenticationEntryPoint;
 import archive.oxahex.api.security.JwtFilter;
 import archive.oxahex.api.security.TokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +20,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final TokenProvider tokenProvider;
-    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
-    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain securityFilterChain(
