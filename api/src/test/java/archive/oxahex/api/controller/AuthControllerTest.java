@@ -1,6 +1,6 @@
 package archive.oxahex.api.controller;
 
-import archive.oxahex.api.dto.form.JoinDto;
+import archive.oxahex.api.dto.request.JoinRequest;
 import archive.oxahex.api.security.TokenProvider;
 import archive.oxahex.api.service.AuthService;
 import archive.oxahex.domain.entity.User;
@@ -51,14 +51,14 @@ class AuthControllerTest {
     @DisplayName("새로운 회원을 등록한다.")
     void join() throws Exception {
         // given
-        JoinDto joinRequest = new JoinDto();
+        JoinRequest joinRequest = new JoinRequest();
         joinRequest.setUsername("test1");
         joinRequest.setPassword("test1test1test1");
         joinRequest.setEmail("test1@gmail.com");
         joinRequest.setPhoneNumber("01011111111");
 
         User user = generateUserEntity("test1", RoleType.ROLE_USER);
-        given(authService.createUser(any(JoinDto.class))).willReturn(user);
+        given(authService.createUser(any(JoinRequest.class))).willReturn(user);
 
 
         // when
@@ -73,6 +73,15 @@ class AuthControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.username").value("test1"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.email").value("test1@gmail.com"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.role").value("ROLE_USER"));
+    }
+
+
+    @Test
+    @DisplayName("회원 로그인 성공 시 Access Token과 Refresh Token이 발급된다.")
+    void login_success() {
+        // given
+        // when
+        // then
     }
 
 

@@ -1,6 +1,6 @@
 package archive.oxahex.api.security;
 
-import archive.oxahex.api.dto.SignInDto;
+import archive.oxahex.api.dto.request.LoginRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -54,13 +54,13 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         ObjectMapper om = new ObjectMapper();
 
         try {
-            SignInDto.Request signInRequest =
-                    om.readValue(request.getInputStream(), SignInDto.Request.class);
+            LoginRequest loginRequest =
+                    om.readValue(request.getInputStream(), LoginRequest.class);
 
             // 미인증된 Authentication 객체
             UsernamePasswordAuthenticationToken authenticationToken =
                     new UsernamePasswordAuthenticationToken(
-                            signInRequest.getEmail(), signInRequest.getPassword()
+                            loginRequest.getEmail(), loginRequest.getPassword()
                     );
 
             // 내부적으로 AuthService에 구현한 loadByUsername 메서드 호출
