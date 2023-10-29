@@ -1,7 +1,8 @@
 package archive.oxahex.api.controller;
 
 import archive.oxahex.api.dto.request.JoinRequest;
-import archive.oxahex.api.security.TokenProvider;
+import archive.oxahex.api.dto.request.LoginRequest;
+import archive.oxahex.api.security.AuthUser;
 import archive.oxahex.api.service.AuthService;
 import archive.oxahex.domain.entity.User;
 import archive.oxahex.domain.type.RoleType;
@@ -16,14 +17,18 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureDataJpa;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
@@ -31,14 +36,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 @AutoConfigureDataJpa
 @AutoConfigureDataRedis
 @ActiveProfiles("test")
-@WebMvcTest(AuthController.class)
+@WebMvcTest(value = AuthController.class)
 class AuthControllerTest {
 
     @MockBean
     public AuthService authService;
 
-    @MockBean
-    public TokenProvider tokenProvider;
+    @Autowired
+    public PasswordEncoder passwordEncoder;
 
     @Autowired
     public MockMvc mockMvc;
@@ -75,13 +80,35 @@ class AuthControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.role").value("ROLE_USER"));
     }
 
-
     @Test
-    @DisplayName("회원 로그인 성공 시 Access Token과 Refresh Token이 발급된다.")
-    void login_success() {
+    @DisplayName("Email과 Password 일치 시 Authorization Header에 JWT 토큰이 전송된다.")
+    @Transactional
+    void login_success() throws Exception {
         // given
+        User user = generateUserEntity("test", RoleType.ROLE_USER);
+        AuthUser authUser = new AuthUser(user);
+
+        given(authService.loadUserByUsername(anyString()))
+                .willReturn(authUser);
+
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setEmail("test@gmail.com");
+        loginRequest.setPassword("testtesttest");
+
         // when
         // then
+        mockMvc
+                .perform(
+                        MockMvcRequestBuilders
+                                .post("/auth/login")
+                                .content(objectMapper.writeValueAsString(loginRequest))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                )
+                .andDo(print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.header().exists("Authorization"));
     }
 
 
@@ -90,7 +117,7 @@ class AuthControllerTest {
         return User.builder()
                 .name(name)
                 .email(name + "@gmail.com")
-                .password(name + name + name)
+                .password(passwordEncoder.encode(name + name + name))
                 .phoneNumber("01011111111")
                 .role(role)
                 .registeredDate(LocalDateTime.now())
