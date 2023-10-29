@@ -2,10 +2,7 @@ package archive.oxahex.domain.entity;
 
 import archive.oxahex.domain.type.RoleType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -14,9 +11,7 @@ import java.util.List;
 @Entity
 @Table(name = "user")
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,4 +47,16 @@ public class User extends BaseEntity {
     public void setPartners(Partners partners) {
         this.partners = partners;
     }
+
+
+    @Builder
+    private User(String name, String email, String password, String phoneNumber, RoleType role, LocalDateTime registeredDate) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.phoneNumber = phoneNumber;
+        this.role = role;
+        this.registeredDate = registeredDate;
+    }
+
 }
