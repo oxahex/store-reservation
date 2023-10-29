@@ -1,6 +1,6 @@
 package archive.oxahex.api.handler;
 
-import archive.oxahex.api.dto.ErrorDto;
+import archive.oxahex.api.dto.response.ErrorResponse;
 import archive.oxahex.api.exception.CustomException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -18,12 +18,12 @@ public class GlobalExceptionHandler {
 
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorDto> bindingException(MethodArgumentNotValidException e) {
+    public ResponseEntity<ErrorResponse> bindingException(MethodArgumentNotValidException e) {
         BindingResult bindingResult = e.getBindingResult();
 
         log.error("[MethodArgumentNotValidException]", e);
 
-        ErrorDto errorResponse = new ErrorDto(
+        ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
                 bindingResult.getAllErrors().get(0).getDefaultMessage()
         );
@@ -32,10 +32,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(CustomException.class)
-    public ResponseEntity<ErrorDto> customException(CustomException e) {
+    public ResponseEntity<ErrorResponse> customException(CustomException e) {
 
         log.error("[CustomException]", e);
-        ErrorDto errorResponse = new ErrorDto(
+        ErrorResponse errorResponse = new ErrorResponse(
                 e.getHttpStatus().value(),
                 e.getErrorMessage()
         );
@@ -45,9 +45,9 @@ public class GlobalExceptionHandler {
 
     // TODO: 컨트롤러 말고 그 이전 단계에서 잡히는 에러 처리
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ErrorDto> accessDeniedException(AccessDeniedException e) {
+    public ResponseEntity<ErrorResponse> accessDeniedException(AccessDeniedException e) {
         log.error("[AccessDeniedException]", e);
-        ErrorDto errorResponse = new ErrorDto(
+        ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.FORBIDDEN.value(),
                 e.getMessage()
         );
@@ -59,10 +59,10 @@ public class GlobalExceptionHandler {
      * 정의 되지 않은 예외 처리
      */
     @ExceptionHandler
-    public ResponseEntity<ErrorDto> serverError(Exception e) {
+    public ResponseEntity<ErrorResponse> serverError(Exception e) {
 
         log.error("[Internal Server Error]", e);
-        ErrorDto errorResponse = new ErrorDto(
+        ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 e.getMessage()
         );

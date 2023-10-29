@@ -1,6 +1,6 @@
 package archive.oxahex.api.handler;
 
-import archive.oxahex.api.dto.ErrorDto;
+import archive.oxahex.api.dto.response.ErrorResponse;
 import archive.oxahex.api.exception.ErrorType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
@@ -43,7 +43,7 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
         response.setStatus(ErrorType.ACCESS_DENIED.getHttpStatus().value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
-        ErrorDto errorResponse = new ErrorDto(
+        ErrorResponse errorResponse = new ErrorResponse(
                 ErrorType.ACCESS_DENIED.getHttpStatus().value(),
                 ErrorType.ACCESS_DENIED.getErrorMessage()
         );

@@ -1,4 +1,4 @@
-package archive.oxahex.api.dto.form;
+package archive.oxahex.api.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -8,7 +8,7 @@ import org.hibernate.validator.constraints.Length;
 
 @Getter
 @Setter
-public class JoinDto {
+public class JoinRequest {
 
     @NotBlank(message = "유저 이름을 입력해주세요.")
     private String username;

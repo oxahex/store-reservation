@@ -1,6 +1,6 @@
 package archive.oxahex.api.handler;
 
-import archive.oxahex.api.dto.ErrorDto;
+import archive.oxahex.api.dto.response.ErrorResponse;
 import archive.oxahex.api.exception.ErrorType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
@@ -45,7 +45,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.setStatus(ErrorType.AUTHENTICATION_FAILURE.getHttpStatus().value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
-        ErrorDto errorResponse = new ErrorDto(
+        ErrorResponse errorResponse = new ErrorResponse(
                 ErrorType.AUTHENTICATION_FAILURE.getHttpStatus().value(),
                 ErrorType.AUTHENTICATION_FAILURE.getErrorMessage()
         );

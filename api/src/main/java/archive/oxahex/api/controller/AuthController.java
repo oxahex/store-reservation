@@ -1,8 +1,8 @@
 package archive.oxahex.api.controller;
 
 import archive.oxahex.api.dto.PartnersDto;
-import archive.oxahex.api.dto.SignInDto;
-import archive.oxahex.api.dto.form.JoinDto;
+import archive.oxahex.api.dto.request.LoginRequest;
+import archive.oxahex.api.dto.request.JoinRequest;
 import archive.oxahex.api.dto.UserDto;
 import archive.oxahex.api.security.AuthUser;
 import archive.oxahex.api.security.TokenProvider;
@@ -41,7 +41,7 @@ public class AuthController {
      */
     @PostMapping("/join")
     public ResponseEntity<UserDto.Info> join(
-            @RequestBody @Valid JoinDto request
+            @RequestBody @Valid JoinRequest request
     ) {
         log.info("[회원가입] request={}", request.getEmail());
         User user = userService.createUser(request);
@@ -60,7 +60,7 @@ public class AuthController {
      */
     @PostMapping("/login")
     public ResponseEntity<?> login(
-            @RequestBody @Valid SignInDto.Request request
+            @RequestBody @Valid LoginRequest request
     ) {
         return ResponseEntity.ok().body(null);
     }

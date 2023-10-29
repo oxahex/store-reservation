@@ -1,6 +1,6 @@
 package archive.oxahex.api.service;
 
-import archive.oxahex.api.dto.form.JoinDto;
+import archive.oxahex.api.dto.request.JoinRequest;
 import archive.oxahex.api.exception.ErrorType;
 import archive.oxahex.api.exception.CustomException;
 
@@ -54,7 +54,7 @@ public class AuthService implements UserDetailsService {
      * @return 생성된 User Entity 객체
      */
     @Transactional
-    public User createUser(JoinDto request) {
+    public User createUser(JoinRequest request) {
 
         log.info("[createUser] email={}, password={}", request.getEmail(), request.getPassword());
         boolean exists = userRepository.existsByEmail(request.getEmail());

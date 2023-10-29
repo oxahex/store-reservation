@@ -1,6 +1,6 @@
 package archive.oxahex.api.service;
 
-import archive.oxahex.api.dto.form.JoinDto;
+import archive.oxahex.api.dto.request.JoinRequest;
 import archive.oxahex.api.exception.CustomException;
 import archive.oxahex.api.exception.ErrorType;
 import archive.oxahex.domain.entity.Partners;
@@ -83,7 +83,7 @@ class AuthServiceTest {
     @DisplayName("회원 가입")
     void createUser_success() {
         // given
-        JoinDto joinRequest = new JoinDto();
+        JoinRequest joinRequest = new JoinRequest();
         joinRequest.setUsername("test1");
         joinRequest.setPassword("test1test1test1");
         joinRequest.setEmail("test1@gmail.com");
@@ -105,7 +105,7 @@ class AuthServiceTest {
     @DisplayName("회원가입 시 기존에 존재하는 Email과 중복되면 안 된다.")
     void createUser_failure() {
         // given
-        JoinDto joinRequest = new JoinDto();
+        JoinRequest joinRequest = new JoinRequest();
         joinRequest.setUsername("test1");
         joinRequest.setPassword("test1test1test1");
         joinRequest.setEmail("test1@gmail.com");

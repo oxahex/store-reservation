@@ -1,4 +1,4 @@
-package archive.oxahex.api.dto;
+package archive.oxahex.api.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class ErrorDto {
+public class ErrorResponse {
 
     private int code;
     private String message;
