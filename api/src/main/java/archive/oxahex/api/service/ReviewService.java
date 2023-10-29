@@ -44,8 +44,11 @@ public class ReviewService {
             throw new CustomException(ErrorType.INVALID_REVIEW_REQUEST);
         }
 
-        Review review = new Review();
-        review.createReview(reservation, rating, content);
+        Review review = Review.builder()
+                .reservation(reservation)
+                .rating(rating)
+                .content(content)
+                .build();
 
         reviewRepository.save(review);
 

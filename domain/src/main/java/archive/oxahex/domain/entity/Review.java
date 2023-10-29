@@ -2,42 +2,42 @@ package archive.oxahex.domain.entity;
 
 import archive.oxahex.domain.type.ReservationStatus;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "review")
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Review extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "review_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_id")
     private Store store;
 
     private Integer rating;
     private String content;
 
-    public void createReview(Reservation reservation, int rate, String content) {
-        // 유저 정보
+    @Builder
+    public Review(Reservation reservation, Integer rating, String content) {
         this.user = reservation.getUser();
-        // 별점
-        this.rating = rate;
-        // 리뷰 내용
+
+        reservation.getStore().increaseReviewCount();
+        this.store = reservation.getStore();
+
+        this.rating = rating;
         this.content = content;
-        // 매장 리뷰 개수 증가 및 저장
-        Store store = reservation.getStore();
-        store.increaseReviewCount();
-        this.store = store;
-        // 예약 상태 REVIEWED로 변경
+
         reservation.setStatus(ReservationStatus.REVIEWED);
     }
 }

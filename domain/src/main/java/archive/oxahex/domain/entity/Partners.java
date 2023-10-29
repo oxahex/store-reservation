@@ -9,8 +9,7 @@ import java.util.List;
 @Entity
 @Table(name = "partners")
 @Getter
-@Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Partners extends BaseEntity {
 
     @Id
@@ -35,4 +34,8 @@ public class Partners extends BaseEntity {
         this.user = user;
     }
 
+    @Builder
+    private Partners(String name) {
+        this.name = name;
+    }
 }

@@ -18,14 +18,14 @@ public class RedisConfig {
     @Value("${spring.data.redis.host}")
     private String host;
     @Value("${spring.data.redis.port}")
-    private int port;
+    private String port;
 
     // Redis Connection Pool
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration conf = new RedisStandaloneConfiguration();
         conf.setHostName(this.host);
-        conf.setPort(this.port);
+        conf.setPort(Integer.parseInt(this.port));
 
         return new LettuceConnectionFactory(conf);
     }

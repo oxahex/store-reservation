@@ -12,8 +12,7 @@ import java.time.LocalDateTime;
 @Table(name = "store")
 @DynamicInsert
 @Getter
-@Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Store extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,7 +35,7 @@ public class Store extends BaseEntity {
     @Column(name = "registered_date")
     private LocalDateTime registeredDate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "partners_id")
     private Partners partners;
 
@@ -61,4 +60,22 @@ public class Store extends BaseEntity {
         this.reviewCount++;
     }
 
+    @Builder
+    private Store(
+            String name,
+            String address,
+            String description,
+            String businessNumber,
+            Integer tableCount,
+            Integer reviewCount,
+            LocalDateTime registeredDate
+    ) {
+        this.name = name;
+        this.address = address;
+        this.description = description;
+        this.businessNumber = businessNumber;
+        this.tableCount = tableCount;
+        this.reviewCount = reviewCount;
+        this.registeredDate = registeredDate;
+    }
 }

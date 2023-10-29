@@ -41,13 +41,14 @@ public class StoreService {
             throw new CustomException(ErrorType.ALREADY_EXIST_STORE);
         }
 
-        Store store = new Store();
-        store.setName(request.getName());
-        store.setAddress(request.getAddress());
-        store.setDescription(request.getDescription());
-        store.setBusinessNumber(request.getBusinessNumber());
-        store.setTableCount(request.getTableCount());
-        store.setRegisteredDate(LocalDateTime.now());
+        Store store = Store.builder()
+                .name(request.getName())
+                .address(request.getAddress())
+                .description(request.getDescription())
+                .businessNumber(request.getBusinessNumber())
+                .tableCount(request.getTableCount())
+                .registeredDate(LocalDateTime.now())
+                .build();
         store.setPartners(partners);
 
         // 스토어

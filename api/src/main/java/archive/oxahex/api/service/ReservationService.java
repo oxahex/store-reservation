@@ -51,12 +51,12 @@ public class ReservationService {
         }
 
         // 예약 생성, 예약 상태는 PENDING
-        Reservation reservation = new Reservation();
-        reservation.setUser(user);
-        reservation.setStore(store);
-        reservation.setStatus(ReservationStatus.PENDING);
-        reservation.setVisitDate(request.getVisitedDate());
-        reservation.setUseTableCount(request.getUseTableCount());
+        Reservation reservation = Reservation.builder()
+                .user(user)
+                .store(store)
+                .status(ReservationStatus.PENDING)
+                .visitDate(request.getVisitedDate())
+                .useTableCount(request.getUseTableCount()).build();
 
         return reservationRepository.save(reservation);
     }
