@@ -2,7 +2,7 @@ package archive.oxahex.api.controller;
 
 import archive.oxahex.api.dto.PartnersDto;
 import archive.oxahex.api.dto.SignInDto;
-import archive.oxahex.api.dto.SignUpDto;
+import archive.oxahex.api.dto.form.JoinDto;
 import archive.oxahex.api.dto.UserDto;
 import archive.oxahex.api.security.AuthUser;
 import archive.oxahex.api.security.TokenProvider;
@@ -15,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,7 +41,7 @@ public class AuthController {
      */
     @PostMapping("/join")
     public ResponseEntity<UserDto.Info> join(
-            @RequestBody @Valid SignUpDto.Request request
+            @RequestBody @Valid JoinDto request
     ) {
         log.info("[회원가입] request={}", request.getEmail());
         User user = userService.createUser(request);

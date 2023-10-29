@@ -1,9 +1,8 @@
 package archive.oxahex.api.service;
 
-import archive.oxahex.api.dto.SignUpDto;
+import archive.oxahex.api.dto.form.JoinDto;
 import archive.oxahex.api.exception.CustomException;
 import archive.oxahex.api.exception.ErrorType;
-import archive.oxahex.api.security.AuthUser;
 import archive.oxahex.domain.entity.Partners;
 import archive.oxahex.domain.entity.User;
 import archive.oxahex.domain.repository.PartnersRepository;
@@ -25,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
@@ -85,17 +83,17 @@ class AuthServiceTest {
     @DisplayName("회원 가입")
     void createUser_success() {
         // given
-        SignUpDto.Request request = new SignUpDto.Request();
-        request.setUsername("test1");
-        request.setPassword("test1test1test1");
-        request.setEmail("test1@gmail.com");
-        request.setPhoneNumber("01011111111");
+        JoinDto joinRequest = new JoinDto();
+        joinRequest.setUsername("test1");
+        joinRequest.setPassword("test1test1test1");
+        joinRequest.setEmail("test1@gmail.com");
+        joinRequest.setPhoneNumber("01011111111");
 
         User user = generateUserEntity("test1", RoleType.ROLE_USER);
         given(userRepository.save(any(User.class))).willReturn(user);
 
         // when
-        User registeredUser = authService.createUser(request);
+        User registeredUser = authService.createUser(joinRequest);
 
         // then
         assertEquals("test1", registeredUser.getName());
@@ -107,17 +105,17 @@ class AuthServiceTest {
     @DisplayName("회원가입 시 기존에 존재하는 Email과 중복되면 안 된다.")
     void createUser_failure() {
         // given
-        SignUpDto.Request request = new SignUpDto.Request();
-        request.setUsername("test1");
-        request.setPassword("test1test1test1");
-        request.setEmail("test1@gmail.com");
-        request.setPhoneNumber("01011111111");
+        JoinDto joinRequest = new JoinDto();
+        joinRequest.setUsername("test1");
+        joinRequest.setPassword("test1test1test1");
+        joinRequest.setEmail("test1@gmail.com");
+        joinRequest.setPhoneNumber("01011111111");
 
         given(userRepository.existsByEmail(anyString())).willReturn(true);
 
         // when
         CustomException exception = assertThrows(CustomException.class,
-                () -> authService.createUser(request));
+                () -> authService.createUser(joinRequest));
 
         // then
         assertEquals(exception.getErrorMessage(), ErrorType.ALREADY_EXIST_USER.getErrorMessage());
@@ -139,7 +137,6 @@ class AuthServiceTest {
 
         // then
         assertEquals("파트너스 이름", generatedPartners.getName());
-//        assertEquals(user.getEmail(), generatedPartners.getUser().getEmail());
         assertEquals(RoleType.ROLE_PARTNERS, user.getRole());
     }
 
