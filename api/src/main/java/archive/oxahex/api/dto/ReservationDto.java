@@ -11,22 +11,6 @@ import java.time.LocalDateTime;
 
 public class ReservationDto {
 
-    /**
-     * 매장 예약 요청
-     */
-    @Getter
-    @Setter
-    public static class Request {
-
-        @NotNull(message = "방문 일자를 입력해주세요")
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
-        @Future(message = "과거 시간은 입력할 수 없습니다.")
-        private LocalDateTime visitedDate;
-
-        @Min(value = 1, message = "사용할 테이블 수를 최소 한 자리 이상 입력해주세요.")
-        private int useTableCount;
-    }
-
     @Getter
     @Setter
     public static class Info {

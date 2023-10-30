@@ -2,6 +2,7 @@ package archive.oxahex.api.controller;
 
 import archive.oxahex.api.dto.ReservationDto;
 import archive.oxahex.api.dto.ReservationSearchType;
+import archive.oxahex.api.dto.request.ReservationRequest;
 import archive.oxahex.api.security.AuthUser;
 import archive.oxahex.api.service.KioskService;
 import archive.oxahex.api.service.ReservationService;
@@ -33,7 +34,7 @@ public class ReservationController {
     @PostMapping("/{storeId}")
     public ResponseEntity<ReservationDto.Detail> requestReservation(
             @PathVariable Long storeId,
-            @RequestBody @Valid ReservationDto.Request request
+            @RequestBody @Valid ReservationRequest request
     ) {
 
         AuthUser authUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

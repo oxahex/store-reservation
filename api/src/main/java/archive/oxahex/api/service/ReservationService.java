@@ -2,6 +2,7 @@ package archive.oxahex.api.service;
 
 import archive.oxahex.api.dto.ReservationDto;
 import archive.oxahex.api.dto.ReservationSearchType;
+import archive.oxahex.api.dto.request.ReservationRequest;
 import archive.oxahex.api.exception.CustomException;
 import archive.oxahex.api.exception.ErrorType;
 import archive.oxahex.domain.entity.Partners;
@@ -38,7 +39,7 @@ public class ReservationService {
      */
     @Transactional
     public Reservation requestReservation(
-            User user, Long storeId, ReservationDto.Request request
+            User user, Long storeId, ReservationRequest request
     ) {
 
         // 해당 상점의 남아 있는 자리를 반환
@@ -152,8 +153,8 @@ public class ReservationService {
                 .orElseThrow(() -> new CustomException(ErrorType.RESERVATION_NOT_FOUND));
 
         // 8시간 조건 확인
-        LocalDateTime cancellableTime = LocalDateTime.now().minusHours(8);
-        if (cancellableTime.isAfter(reservation.getVisitDate())) {
+        LocalDateTime cancellableTime = reservation.getVisitDate().minusHours(8);
+        if (cancellableTime.isAfter(LocalDateTime.now())) {
 
             reservation.setStatus(ReservationStatus.CANCELLED);
             reservation.getStore().addTableCount(reservation.getUseTableCount());
