@@ -1,6 +1,7 @@
 package archive.oxahex.api.controller;
 
 import archive.oxahex.api.dto.ReviewDto;
+import archive.oxahex.api.dto.request.ReviewRequest;
 import archive.oxahex.api.service.AuthService;
 import archive.oxahex.api.service.ReviewService;
 import archive.oxahex.domain.entity.Review;
@@ -32,7 +33,7 @@ public class ReviewController {
     @PostMapping("/reservations/{reservationId}")
     public ResponseEntity<ReviewDto.Info> review(
             @PathVariable Long reservationId,
-            @RequestBody @Valid ReviewDto.Request request
+            @RequestBody @Valid ReviewRequest request
     ) {
         Review review = reviewService.addReview(
                 reservationId, request.getRating(), request.getContent()
