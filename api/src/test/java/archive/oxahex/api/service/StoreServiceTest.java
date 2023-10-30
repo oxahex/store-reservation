@@ -67,7 +67,10 @@ class StoreServiceTest {
         // given
         User user = User.builder().build();
         StoreRegisterRequest request = new StoreRegisterRequest();
+        request.setBusinessNumber("12345678901");
 
+        given(partnersRepository.findByUser(any(User.class)))
+                .willReturn(Optional.of(Partners.builder().build()));
         given(storeRepository.existsByBusinessNumber(anyString()))
                 .willReturn(true);
 
@@ -97,7 +100,7 @@ class StoreServiceTest {
                 .willReturn(Optional.of(partners));
 
         given(storeRepository.existsByBusinessNumber(anyString()))
-                .willReturn(false);
+                .willReturn(Boolean.FALSE);
 
         Store store = Store.builder()
                 .name(request.getName())

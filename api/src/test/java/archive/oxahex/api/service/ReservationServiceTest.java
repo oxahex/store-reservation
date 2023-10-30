@@ -3,6 +3,7 @@ package archive.oxahex.api.service;
 import archive.oxahex.api.dto.request.ReservationRequest;
 import archive.oxahex.api.exception.CustomException;
 import archive.oxahex.api.exception.ErrorType;
+import archive.oxahex.domain.entity.Partners;
 import archive.oxahex.domain.entity.Reservation;
 import archive.oxahex.domain.entity.Store;
 import archive.oxahex.domain.entity.User;
@@ -78,8 +79,11 @@ class ReservationServiceTest {
         ReservationRequest request = new ReservationRequest();
         request.setUseTableCount(2);
 
+        Partners partners = Partners.builder().build();
         Store store = Store.builder()
-                .tableCount(1).build();
+                .partners(partners)
+                .tableCount(1)
+                .build();
 
         given(storeRepository.findById(anyLong()))
                 .willReturn(Optional.of(store));
@@ -105,8 +109,11 @@ class ReservationServiceTest {
         ReservationRequest request = new ReservationRequest();
         request.setUseTableCount(1);
 
+        Partners partners = Partners.builder().build();
         Store store = Store.builder()
-                .tableCount(1).build();
+                .partners(partners)
+                .tableCount(1)
+                .build();
 
         given(storeRepository.findById(anyLong()))
                 .willReturn(Optional.of(store));
@@ -152,7 +159,13 @@ class ReservationServiceTest {
 
         // given
         ReservationStatus changedStatus = ReservationStatus.ALLOWED;
-        Store store = Store.builder().tableCount(2).build();
+        Partners partners = Partners.builder().build();
+
+        Store store = Store.builder()
+                .partners(partners)
+                .tableCount(2)
+                .build();
+        
         given(reservationRepository.findById(anyLong()))
                 .willReturn(Optional.of(Reservation.builder()
                         .status(ReservationStatus.PENDING)
@@ -214,7 +227,9 @@ class ReservationServiceTest {
 
         // given
         LocalDateTime now = LocalDateTime.now();
+        Partners partners = Partners.builder().build();
         Store store = Store.builder()
+                .partners(partners)
                 .tableCount(1)
                 .build();
         given(reservationRepository.findById(anyLong()))

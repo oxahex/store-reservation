@@ -163,7 +163,6 @@ class AuthControllerTest {
         // given
         // 파트너스 가입 요청 Body
         JoinPartnersRequest request = new JoinPartnersRequest();
-        request.setName("");
 
         Partners partners = Partners.builder()
                         .name("파트너스 이름").build();
@@ -184,6 +183,37 @@ class AuthControllerTest {
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code").value(400))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("파트너스 이름을 작성해주세요."));
+    }
+
+    @Test
+    @DisplayName("파트너스 이름은 4글자 이상이어야 한다.")
+    @WithMockUser
+    void joinPartners_failure_count_partnersName() throws Exception {
+
+        // given
+        // 파트너스 가입 요청 Body
+        JoinPartnersRequest request = new JoinPartnersRequest();
+        request.setName("4글자");
+
+        Partners partners = Partners.builder()
+                .name("파트너스 이름").build();
+        given(authService.createPartners(any(User.class), anyString()))
+                .willReturn(partners);
+
+        // when
+        // then
+        mockMvc
+                .perform(
+                        MockMvcRequestBuilders
+                                .post("/auth/partners")
+                                .content(objectMapper.writeValueAsString(request))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                )
+                .andDo(print())
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code").value(400))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("파트너스 이름은 4자 이상 입력해주세요."));
     }
 
     private User generateUserEntity(String name, RoleType role) {

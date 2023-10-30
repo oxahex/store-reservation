@@ -2,6 +2,7 @@ package archive.oxahex.api.service;
 
 import archive.oxahex.api.exception.CustomException;
 import archive.oxahex.api.exception.ErrorType;
+import archive.oxahex.domain.entity.Partners;
 import archive.oxahex.domain.entity.Reservation;
 import archive.oxahex.domain.entity.Review;
 import archive.oxahex.domain.entity.Store;
@@ -97,8 +98,11 @@ class ReviewServiceTest {
     void addReview_success() {
 
         // given
+        Partners partners = Partners.builder().build();
         Store store = Store.builder()
-                .reviewCount(1).build();
+                .partners(partners)
+                .reviewCount(1)
+                .build();
 
         given(reservationRepository.findById(anyLong()))
                 .willReturn(Optional.of(Reservation.builder()
