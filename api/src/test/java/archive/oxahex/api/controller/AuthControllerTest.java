@@ -16,6 +16,7 @@ import archive.oxahex.domain.type.RoleType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.antlr.v4.runtime.Token;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -61,6 +62,7 @@ class AuthControllerTest {
     public PasswordEncoder passwordEncoder;
 
     @Mock
+    public TokenProvider tokenProvider;
 
     @Autowired
     public MockMvc mockMvc;
@@ -183,8 +185,6 @@ class AuthControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code").value(400))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("파트너스 이름은 4자 이상 입력해주세요."));
     }
-
-
 
     private User generateUserEntity(String name, RoleType role) {
 
