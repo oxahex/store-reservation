@@ -1,9 +1,11 @@
 package archive.oxahex.api.controller;
 
 import archive.oxahex.api.dto.PartnersDto;
+import archive.oxahex.api.dto.request.JoinPartnersRequest;
 import archive.oxahex.api.dto.request.LoginRequest;
 import archive.oxahex.api.dto.request.JoinRequest;
 import archive.oxahex.api.dto.UserDto;
+import archive.oxahex.api.dto.response.JoinPartnersResponse;
 import archive.oxahex.api.security.AuthUser;
 import archive.oxahex.api.security.TokenProvider;
 import archive.oxahex.api.service.AuthService;
@@ -76,8 +78,8 @@ public class AuthController {
      */
     @PostMapping("/partners")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<PartnersDto.Response> joinPartners(
-            @RequestBody @Valid PartnersDto.Request request
+    public ResponseEntity<JoinPartnersResponse> joinPartners(
+            @RequestBody @Valid JoinPartnersRequest request
     ) {
 
         AuthUser authUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -92,12 +94,12 @@ public class AuthController {
         // 기존 Refresh Token 업데이트
 //        tokenProvider.generateRefreshToken(user);
 
-        PartnersDto.Response partnersResponse =
-                PartnersDto.fromEntityToPartnersResponse(user, partners, accessToken);
+        JoinPartnersResponse response =
+                JoinPartnersResponse.fromEntityToResponse(user, partners, accessToken);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", accessToken);
 
-        return ResponseEntity.ok().headers(headers).body(partnersResponse);
+        return ResponseEntity.ok().headers(headers).body(response);
     }
 }
