@@ -17,12 +17,14 @@ public class WithMockUserSecurityContextFactory implements WithSecurityContextFa
     @Override
     public SecurityContext createSecurityContext(WithMockUser annotation) {
         String email = annotation.email();
+        RoleType role = annotation.role();
 
-        User user = User.builder()
-                .email(email)
-                .role(RoleType.ROLE_USER)
-                .build();
-        AuthUser authUser = new AuthUser(user);
+        AuthUser authUser = new AuthUser(
+                User.builder()
+                        .email(email)
+                        .role(role)
+                        .build()
+        );
 
         Authentication authentication =
                 new UsernamePasswordAuthenticationToken(
