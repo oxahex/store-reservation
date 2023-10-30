@@ -183,7 +183,7 @@ class AuthControllerTest {
                 .andDo(print())
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code").value(400))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("파트너스 이름은 4자 이상 입력해주세요."));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("파트너스 이름을 작성해주세요."));
     }
 
     private User generateUserEntity(String name, RoleType role) {
