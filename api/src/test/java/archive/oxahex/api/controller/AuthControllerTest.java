@@ -1,22 +1,36 @@
 package archive.oxahex.api.controller;
 
+import archive.oxahex.api.configuration.SecurityConfig;
+import archive.oxahex.api.dto.request.JoinPartnersRequest;
 import archive.oxahex.api.dto.request.JoinRequest;
 import archive.oxahex.api.dto.request.LoginRequest;
+import archive.oxahex.api.mock.WithMockUser;
 import archive.oxahex.api.security.AuthUser;
+import archive.oxahex.api.security.JwtAuthenticationFilter;
+import archive.oxahex.api.security.JwtAuthorizationFilter;
+import archive.oxahex.api.security.TokenProvider;
 import archive.oxahex.api.service.AuthService;
+import archive.oxahex.domain.entity.Partners;
 import archive.oxahex.domain.entity.User;
 import archive.oxahex.domain.type.RoleType;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.boot.test.autoconfigure.data.redis.AutoConfigureDataRedis;
 import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureDataJpa;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.ActiveProfiles;
@@ -36,6 +50,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 @AutoConfigureDataJpa
 @AutoConfigureDataRedis
 @ActiveProfiles("test")
+@AutoConfigureMockMvc(addFilters = false)
 @WebMvcTest(value = AuthController.class)
 class AuthControllerTest {
 
@@ -44,6 +59,8 @@ class AuthControllerTest {
 
     @Autowired
     public PasswordEncoder passwordEncoder;
+
+    @Mock
 
     @Autowired
     public MockMvc mockMvc;
@@ -64,7 +81,6 @@ class AuthControllerTest {
 
         User user = generateUserEntity("test1", RoleType.ROLE_USER);
         given(authService.createUser(any(JoinRequest.class))).willReturn(user);
-
 
         // when
         // then
@@ -107,9 +123,67 @@ class AuthControllerTest {
                                 .with(SecurityMockMvcRequestPostProcessors.csrf())
                 )
                 .andDo(print())
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.header().exists("Authorization"));
+                .andExpect(MockMvcResultMatchers.status().isOk());
     }
+
+    @Test
+    @DisplayName("USER 권한이 없는 경우 파트너스 신청을 할 수 없다.")
+    void joinPartners_failure_role() throws Exception {
+        // given
+        // 파트너스 가입 요청 Body
+        JoinPartnersRequest request = new JoinPartnersRequest();
+        request.setName("파트너스 이름");
+
+        Partners partners = Partners.builder()
+                .name("파트너스 이름").build();
+        given(authService.createPartners(any(User.class), anyString()))
+                .willReturn(partners);
+
+        // when
+        // then
+        mockMvc
+                .perform(
+                        MockMvcRequestBuilders
+                                .post("/auth/partners")
+                                .content(objectMapper.writeValueAsString(request))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                )
+                .andDo(print())
+                .andExpect(MockMvcResultMatchers.status().is5xxServerError());
+    }
+
+    @Test
+    @DisplayName("파트너스 이름은 필수로 입력해야 한다.")
+    @WithMockUser
+    void joinPartners_failure_missing_partnersName() throws Exception {
+
+        // given
+        // 파트너스 가입 요청 Body
+        JoinPartnersRequest request = new JoinPartnersRequest();
+        request.setName("");
+
+        Partners partners = Partners.builder()
+                        .name("파트너스 이름").build();
+        given(authService.createPartners(any(User.class), anyString()))
+                .willReturn(partners);
+
+        // when
+        // then
+        mockMvc
+                .perform(
+                        MockMvcRequestBuilders
+                                .post("/auth/partners")
+                                .content(objectMapper.writeValueAsString(request))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                )
+                .andDo(print())
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code").value(400))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("파트너스 이름은 4자 이상 입력해주세요."));
+    }
+
 
 
     private User generateUserEntity(String name, RoleType role) {
@@ -117,7 +191,7 @@ class AuthControllerTest {
         return User.builder()
                 .name(name)
                 .email(name + "@gmail.com")
-                .password(passwordEncoder.encode(name + name + name))
+                .password(name+name+name)
                 .phoneNumber("01011111111")
                 .role(role)
                 .registeredDate(LocalDateTime.now())

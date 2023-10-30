@@ -1,6 +1,5 @@
 package archive.oxahex.api.controller;
 
-import archive.oxahex.api.dto.PartnersDto;
 import archive.oxahex.api.dto.request.JoinPartnersRequest;
 import archive.oxahex.api.dto.request.LoginRequest;
 import archive.oxahex.api.dto.request.JoinRequest;
@@ -29,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final AuthService userService;
+    private final AuthService authService;
     private final TokenProvider tokenProvider;
 
     /**
@@ -46,7 +45,7 @@ public class AuthController {
             @RequestBody @Valid JoinRequest request
     ) {
         log.info("[회원가입] request={}", request.getEmail());
-        User user = userService.createUser(request);
+        User user = authService.createUser(request);
         return ResponseEntity.ok().body(UserDto.fromEntityToUserInfo(user));
     }
 
@@ -85,7 +84,7 @@ public class AuthController {
         AuthUser authUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = authUser.getUser();
 
-        Partners partners = userService.createPartners(user, request.getName());
+        Partners partners = authService.createPartners(user, request.getName());
         log.info("partners={}", partners.getName());
 
         // 새 Access Token 발급
