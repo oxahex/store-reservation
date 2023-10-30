@@ -39,12 +39,6 @@ public class Store extends BaseEntity {
     @JoinColumn(name = "partners_id")
     private Partners partners;
 
-    // 매장 저장 시 partners.stores에도 매장 객체 저장
-    public void setPartners(Partners partners) {
-        this.partners = partners;
-        partners.getStores().add(this);
-    }
-
     // 예약 승인 시 테이블 수 감소 처리
     public void removeTableCount(int useTableCount) {
         this.tableCount -= useTableCount;
@@ -60,6 +54,7 @@ public class Store extends BaseEntity {
         this.reviewCount++;
     }
 
+
     @Builder
     private Store(
             String name,
@@ -68,6 +63,7 @@ public class Store extends BaseEntity {
             String businessNumber,
             Integer tableCount,
             Integer reviewCount,
+            Partners partners,
             LocalDateTime registeredDate
     ) {
         this.name = name;
@@ -76,6 +72,10 @@ public class Store extends BaseEntity {
         this.businessNumber = businessNumber;
         this.tableCount = tableCount;
         this.reviewCount = reviewCount;
+
+        partners.getStores().add(this);
+        this.partners = partners;
+
         this.registeredDate = registeredDate;
     }
 }

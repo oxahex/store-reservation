@@ -3,12 +3,11 @@ package archive.oxahex.api.controller;
 import archive.oxahex.api.dto.PartnersDto;
 import archive.oxahex.api.dto.ReservationDto;
 import archive.oxahex.api.dto.StoreDto;
+import archive.oxahex.api.dto.request.StoreRegisterRequest;
 import archive.oxahex.api.security.AuthUser;
-import archive.oxahex.api.security.TokenProvider;
 import archive.oxahex.api.service.PartnersService;
 import archive.oxahex.api.service.ReservationService;
 import archive.oxahex.api.service.StoreService;
-import archive.oxahex.api.service.AuthService;
 import archive.oxahex.domain.entity.Partners;
 import archive.oxahex.domain.entity.Reservation;
 import archive.oxahex.domain.entity.Store;
@@ -61,7 +60,7 @@ public class PartnersController {
      */
     @PostMapping("/store")
     public ResponseEntity<StoreDto.Info> registerStore(
-            @RequestBody @Valid StoreDto.Request request
+            @RequestBody @Valid StoreRegisterRequest request
     ) {
 
         // 유저

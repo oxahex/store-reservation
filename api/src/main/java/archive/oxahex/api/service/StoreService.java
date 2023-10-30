@@ -1,7 +1,7 @@
 package archive.oxahex.api.service;
 
 import archive.oxahex.api.dto.SortType;
-import archive.oxahex.api.dto.StoreDto;
+import archive.oxahex.api.dto.request.StoreRegisterRequest;
 import archive.oxahex.api.exception.ErrorType;
 import archive.oxahex.api.exception.CustomException;
 import archive.oxahex.domain.entity.Partners;
@@ -29,7 +29,7 @@ public class StoreService {
      * 매장을 등록할 파트너스와 매장 정보를 받아 매장을 저장
      */
     @Transactional
-    public Store registerStore(User user, StoreDto.Request request) {
+    public Store registerStore(User user, StoreRegisterRequest request) {
 
         Partners partners = partnersRepository.findByUser(user)
                 .orElseThrow(() -> new CustomException(ErrorType.PARTNERS_NOT_FOUND));
@@ -37,6 +37,7 @@ public class StoreService {
         // 이미 등록된 매장인 경우
         boolean exists =
                 storeRepository.existsByBusinessNumber(request.getBusinessNumber());
+
         if (exists) {
             throw new CustomException(ErrorType.ALREADY_EXIST_STORE);
         }
@@ -47,9 +48,9 @@ public class StoreService {
                 .description(request.getDescription())
                 .businessNumber(request.getBusinessNumber())
                 .tableCount(request.getTableCount())
+                .partners(partners)
                 .registeredDate(LocalDateTime.now())
                 .build();
-        store.setPartners(partners);
 
         // 스토어
         return storeRepository.save(store);

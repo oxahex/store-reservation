@@ -54,31 +54,4 @@ public class StoreDto {
 
         return storeDetail;
     }
-
-    @Getter
-    @Setter
-    public static class Request {
-
-        @NotBlank(message = "매장 이름을 입력해주세요.")
-        private String name;
-
-        @NotBlank(message = "매장 주소를 입력해주세요.")
-        private String address;
-
-        @NotBlank(message = "매장 설명을 입력해주세요.")
-        private String description;
-
-        @NotNull(message = "사용 가능한 테이블 수를 입력해주세요.")
-        private Integer tableCount;
-
-        @NotBlank(message = "해당 매장의 사업자 등록 번호를 입력해주세요")
-        private String businessNumber;
-    }
-
-    public static class Response {
-        private UserDto.Info user;
-        private StoreDto.Info store;
-    }
-
-
 }
