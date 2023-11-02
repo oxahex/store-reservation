@@ -91,15 +91,14 @@ public class StoreService {
         Partners partners = partnersRepository.findByUser(user)
                 .orElseThrow(() -> new CustomException(ErrorType.PARTNERS_NOT_FOUND));
 
-        // 해당 매장 소유주가 아닌 경우
-        if (!Objects.equals(partners.getId(), partnersId)) {
-            throw new CustomException(ErrorType.STORE_ACCESS_DENIED);
-        }
-
         // 매장 존재 여부 확인
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new CustomException(ErrorType.STORE_NOT_FOUND));
 
+        // 해당 매장 소유주가 아닌 경우
+        if (store.getPartners() != partners) {
+            throw new CustomException(ErrorType.STORE_ACCESS_DENIED);
+        }
 
         System.out.println(request.getAddress());
         store.modifyStoreInfo(
