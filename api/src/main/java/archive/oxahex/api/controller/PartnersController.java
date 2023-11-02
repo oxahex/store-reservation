@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -77,7 +78,7 @@ public class PartnersController {
 
     /**
      * 저장한 매장 정보 변경
-     * 매장 ID와 변경할 정보를 받음(사업자 번호는 변경 불가)
+     * 파트너스 ID, 매장 ID와 변경할 정보를 받음(사업자 번호는 변경 불가)
      */
     @PutMapping("/{partnersId}/stores/{storeId}")
     public ResponseEntity<StoreDto.Detail> modifyStore(
@@ -93,6 +94,26 @@ public class PartnersController {
         StoreDto.Detail storeDetail = StoreDto.fromEntityToStoreDetail(store);
 
         return ResponseEntity.ok().body(storeDetail);
+    }
+
+    /**
+     * 등록 매장 삭제
+     * 파트너스 ID와 매장 ID를 받아 삭제
+     */
+    @DeleteMapping("/{partnersId}/stores/{storeId}")
+    public ResponseEntity<StoreDto.Detail> deleteStore(
+            @PathVariable Long partnersId,
+            @PathVariable Long storeId
+    ) {
+        // 유저
+        AuthUser authUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = authUser.getUser();
+
+        Store store = storeService.deleteStore(user, partnersId, storeId);
+
+        StoreDto.Detail deletedStoreDetail = StoreDto.fromEntityToStoreDetail(store);
+
+        return ResponseEntity.ok().body(deletedStoreDetail);
     }
 
     /**
