@@ -35,7 +35,7 @@ public class KioskService {
             throw new CustomException(ErrorType.INVALID_RESERVATION);
         }
         // 시간 체크: 지정한 예약 시간 이후에 도착하는 경우
-        if (now.isAfter(reservation.getVisitDate())) {
+        if (now.isAfter(reservation.getVisitDate().minusMinutes(10))) {
             throw new CustomException(ErrorType.TOO_LATE_TO_USE);
         }
 

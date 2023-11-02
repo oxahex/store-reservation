@@ -92,7 +92,7 @@ class KioskServiceTest {
     }
 
     @Test
-    @DisplayName("키오스크에서 매장 도착 확인 시 유효한 시간에 도착하는 경우 입장이 가능하다.")
+    @DisplayName("키오스크에서 매장 도착 확인 시 예약 시간 10분 전 도착 시 입장이 가능하다.")
     void checkStoreEntry_success() {
 
         // given
@@ -108,7 +108,7 @@ class KioskServiceTest {
                         .status(ReservationStatus.ALLOWED)
                         .store(store)
                         .useTableCount(1)
-                        .visitDate(now.plusMinutes(1))
+                        .visitDate(now.plusMinutes(11))
                         .build()));
 
         // when
