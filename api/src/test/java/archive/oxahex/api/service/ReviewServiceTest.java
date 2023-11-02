@@ -11,10 +11,10 @@ import archive.oxahex.domain.type.ReservationStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.core.parameters.P;
 
 import java.util.Optional;
 
@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ReviewServiceTest {
@@ -209,5 +210,87 @@ class ReviewServiceTest {
         // then
         assertEquals(modifiedReview.getContent(), "새로운 리뷰 내용으로 수정");
         assertEquals(modifiedReview.getRating(), 5);
+    }
+
+    @Test
+    @DisplayName("리뷰가 이미 삭제된 경우 리뷰를 삭제할 수 없습니다.")
+    void deleteReview_failure_review_not_found() {
+
+        // given
+        User user = User.builder().build();
+
+        Partners partners = Partners.builder().build();
+        Store store = Store.builder().partners(partners).reviewCount(0).build();
+        Reservation reservation = Reservation.builder().user(user).store(store).build();
+        Review review = Review.builder().reservation(reservation).build();
+
+        given(reviewRepository.findById(anyLong()))
+                .willReturn(Optional.empty());
+
+        // when
+        CustomException exception = assertThrows(CustomException.class,
+                () -> reviewService.deleteReview(user, 1L));
+
+        // then
+        assertEquals(ErrorType.REVIEW_NOT_FOUND.getHttpStatus(), exception.getHttpStatus());
+        assertEquals(ErrorType.REVIEW_NOT_FOUND.getErrorMessage(), exception.getErrorMessage());
+    }
+
+    @Test
+    @DisplayName("리뷰 작성자가 아닌 경우 리뷰를 삭제할 수 없습니다.")
+    void deleteReview_failure_user_un_matched() {
+        // given
+        User user1 = User.builder().id(1L).build();
+        User user2 = User.builder().id(2L).build();
+
+        Partners partners = Partners.builder().build();
+        Store store = Store.builder().partners(partners).reviewCount(1).build();
+        Reservation reservation = Reservation.builder().user(user1).store(store).build();
+        Review review = Review.builder()
+                .reservation(reservation)
+                .rating(3)
+                .content("리뷰 내용")
+                .build();
+
+
+        given(reviewRepository.findById(anyLong()))
+                .willReturn(Optional.of(review));
+
+        // when: 저장된 리뷰와 다른 사용자가 요청
+        CustomException exception = assertThrows(CustomException.class,
+                () -> reviewService.deleteReview(user2, 1L));
+
+        // then
+        assertEquals(ErrorType.REVIEW_ACCESS_DENIED.getErrorMessage(), exception.getErrorMessage());
+        assertEquals(ErrorType.REVIEW_ACCESS_DENIED.getHttpStatus(), exception.getHttpStatus());
+    }
+
+    @Test
+    @DisplayName("리뷰를 삭제하는 경우 해당 리뷰가 삭제되고, 해당 매장의 리뷰 개수가 하나 줄어듭니다.")
+    void deleteReview_success() {
+
+        // given
+        User user = User.builder().id(1L).build();
+
+        Partners partners = Partners.builder().build();
+        Store store = Store.builder().partners(partners).reviewCount(1).build();
+        Reservation reservation = Reservation.builder().user(user).store(store).build();
+        Review review = Review.builder()
+                .reservation(reservation)
+                .rating(3)
+                .content("리뷰 내용")
+                .build();
+
+        given(reviewRepository.findById(anyLong()))
+                .willReturn(Optional.of(review));
+
+        // when
+        reviewService.deleteReview(user, 1L);
+
+        ArgumentCaptor<Review> captor = ArgumentCaptor.forClass(Review.class);
+        // then
+
+        verify(reviewRepository, times(1)).delete(captor.capture());
+        System.out.println(captor.getValue().getStore().getReviewCount());
     }
 }

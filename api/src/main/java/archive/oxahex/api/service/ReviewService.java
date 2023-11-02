@@ -62,6 +62,7 @@ public class ReviewService {
      * @param user 리뷰 작성자
      * @param request 변경할 리뷰 내용
      */
+    @Transactional
     public Review modifyReview(User user, Long reviewId, ReviewModifyRequest request) {
 
         // 리뷰
@@ -79,6 +80,7 @@ public class ReviewService {
 
     }
 
+    @Transactional
     public Review deleteReview(User user, Long reviewId) {
 
         // 리뷰
@@ -86,13 +88,15 @@ public class ReviewService {
                 .orElseThrow(() -> new CustomException(ErrorType.REVIEW_NOT_FOUND));
 
         // 리뷰 작성자와 유저가 일치하지 않는 경우
-        if (review.getUser() != user) {
+        if (!Objects.equals(review.getUser().getId(), user.getId())) {
             throw new CustomException(ErrorType.REVIEW_ACCESS_DENIED);
         }
 
-        review.deleteReview();
+
+        review.getStore().decreaseReviewCount();
         reviewRepository.delete(review);
 
+        System.out.println("count: " + review.getStore().getReviewCount());
         return review;
     }
 
