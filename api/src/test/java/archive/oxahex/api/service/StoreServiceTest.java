@@ -121,6 +121,14 @@ class StoreServiceTest {
     }
 
     @Test
+    @DisplayName("매장 정보 수정")
+    void modifyStore_failure() {
+        // given
+        // when
+        // then
+    }
+
+    @Test
     @DisplayName("ASC 타입 조회 시 등록 순서대로 상점리스트를 반환한다.")
     void getAllStore_asc() {
 

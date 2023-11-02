@@ -86,18 +86,19 @@ public class AuthController {
 
         Partners partners = authService.createPartners(user, request.getName());
         log.info("partners={}", partners.getName());
+        System.out.println("user.getRole(): " + user.getRole());
 
         // 새 Access Token 발급
         String accessToken = tokenProvider.generateAccessToken(authUser);
 
         // 기존 Refresh Token 업데이트
-//        tokenProvider.generateRefreshToken(user);
+        tokenProvider.generateRefreshToken(authUser);
 
         JoinPartnersResponse response =
                 JoinPartnersResponse.fromEntityToResponse(user, partners, accessToken);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", accessToken);
+        headers.add("Authorization", "Bearer " + accessToken);
 
         return ResponseEntity.ok().headers(headers).body(response);
     }

@@ -95,6 +95,7 @@ public class AuthService implements UserDetailsService {
 
         // 유저 권한 업데이트
         user.setRole(RoleType.ROLE_PARTNERS);
+        userRepository.save(user);
 
         Partners partners = Partners.builder()
                 .name(partnersName).build();
