@@ -6,10 +6,13 @@ import archive.oxahex.api.dto.request.StoreRegisterRequest;
 import archive.oxahex.api.exception.ErrorType;
 import archive.oxahex.api.exception.CustomException;
 import archive.oxahex.domain.entity.Partners;
+import archive.oxahex.domain.entity.Reservation;
 import archive.oxahex.domain.entity.Store;
 import archive.oxahex.domain.entity.User;
 import archive.oxahex.domain.repository.PartnersRepository;
+import archive.oxahex.domain.repository.ReservationRepository;
 import archive.oxahex.domain.repository.StoreRepository;
+import archive.oxahex.domain.type.ReservationStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +27,7 @@ public class StoreService {
 
     private final StoreRepository storeRepository;
     private final PartnersRepository partnersRepository;
+    private final ReservationRepository reservationRepository;
 
     /**
      * 매장 정보를 받아 새로운 매장 등록
@@ -124,14 +128,21 @@ public class StoreService {
         Partners partners = partnersRepository.findByUser(user)
                 .orElseThrow(() -> new CustomException(ErrorType.PARTNERS_NOT_FOUND));
 
-        // 해당 매장 소유주가 아닌 경우
-        if (!Objects.equals(partners.getId(), partnersId)) {
-            throw new CustomException(ErrorType.STORE_ACCESS_DENIED);
-        }
-
         // 매장 존재 여부 확인
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new CustomException(ErrorType.STORE_NOT_FOUND));
+
+        // 해당 매장 소유주가 아닌 경우
+        if (store.getPartners() != partners) {
+            throw new CustomException(ErrorType.STORE_ACCESS_DENIED);
+        }
+
+        // 진행중인 예약이 있는 경우 삭제 불가
+        List<Reservation> reservations =
+                reservationRepository.findAllByStoreAndStatus(store, ReservationStatus.PENDING);
+        if (!reservations.isEmpty()) {
+            throw new CustomException(ErrorType.FAIL_TO_DELETE_STORE);
+        }
 
         storeRepository.delete(store);
 

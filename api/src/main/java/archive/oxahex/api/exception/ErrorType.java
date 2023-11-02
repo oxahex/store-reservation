@@ -13,6 +13,7 @@ public enum ErrorType {
     STORE_ACCESS_DENIED(HttpStatus.FORBIDDEN, "해당 매장에 대한 권한이 없습니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "유저를 찾을 수 없습니다."),
     STORE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 매장입니다."),
+    FAIL_TO_DELETE_STORE(HttpStatus.CONFLICT, "대기 중 예약이 존재하는 경우 매장을 삭제할 수 없습니다."),
     RESERVATION_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 예약 건입니다."),
     PARTNERS_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 파트너스를 찾을 수 없습니다."),
     ALREADY_EXIST_PARTNERS_NAME(HttpStatus.CONFLICT, "이미 존재하는 파트너스 이름입니다."),

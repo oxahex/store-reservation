@@ -6,10 +6,13 @@ import archive.oxahex.api.dto.request.StoreRegisterRequest;
 import archive.oxahex.api.exception.CustomException;
 import archive.oxahex.api.exception.ErrorType;
 import archive.oxahex.domain.entity.Partners;
+import archive.oxahex.domain.entity.Reservation;
 import archive.oxahex.domain.entity.Store;
 import archive.oxahex.domain.entity.User;
 import archive.oxahex.domain.repository.PartnersRepository;
+import archive.oxahex.domain.repository.ReservationRepository;
 import archive.oxahex.domain.repository.StoreRepository;
+import archive.oxahex.domain.type.ReservationStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +21,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,6 +43,9 @@ class StoreServiceTest {
 
     @Mock
     PartnersRepository partnersRepository;
+
+    @Mock
+    ReservationRepository reservationRepository;
 
     @Test
     @DisplayName("기존에 파트너스 등록을 하지 않은 경우 매장을 등록할 수 없다.")
@@ -256,6 +263,135 @@ class StoreServiceTest {
         assertEquals(modifiedStore.getDescription(), "변경할 설명");
         assertEquals(modifiedStore.getPartners(), store.getPartners());
         assertEquals(modifiedStore.getBusinessNumber(), store.getBusinessNumber());
+
+    }
+
+    @Test
+    @DisplayName("해당 유저의 파트너스 정보가 없는 경우 매장 삭제가 불가능하다.")
+    void deleteStore_failure_partners_not_found() {
+
+        // given
+        User user = User.builder().build();
+        Partners partners1 = Partners.builder().name("partners1").build();
+        Partners partners2 = Partners.builder().name("partners2").build();
+        Store store = Store.builder().partners(partners1).build();
+
+        given(partnersRepository.findByUser(any(User.class)))
+                .willReturn(Optional.empty());
+
+        // when
+        CustomException exception = assertThrows(CustomException.class,
+                () -> storeService.deleteStore(user, 1L, 1L));
+
+        // then
+        assertEquals(ErrorType.PARTNERS_NOT_FOUND.getHttpStatus(), exception.getHttpStatus());
+        assertEquals(ErrorType.PARTNERS_NOT_FOUND.getErrorMessage(), exception.getErrorMessage());
+    }
+
+    @Test
+    @DisplayName("해당 매장의 소유주가 아닌 경우 매장 삭제가 불가능하다.")
+    void deleteStore_failure_store_access_denied() {
+
+        // given
+        User user = User.builder().build();
+        Partners partners1 = Partners.builder().name("partners1").build();
+        Partners partners2 = Partners.builder().name("partners2").build();
+        Store store = Store.builder().partners(partners1).build();
+
+        given(partnersRepository.findByUser(any(User.class)))
+                .willReturn(Optional.of(partners2));
+
+        given(storeRepository.findById(anyLong()))
+                .willReturn(Optional.of(store));
+
+        // when
+        CustomException exception = assertThrows(CustomException.class,
+                () -> storeService.deleteStore(user, 1L, 1L));
+
+        // then
+        assertEquals(ErrorType.STORE_ACCESS_DENIED.getHttpStatus(), exception.getHttpStatus());
+        assertEquals(ErrorType.STORE_ACCESS_DENIED.getErrorMessage(), exception.getErrorMessage());
+    }
+
+    @Test
+    @DisplayName("해당 매장이 존재하지 않는 경우 매장 삭제가 불가능하다.")
+    void deleteStore_failure_store_not_found() {
+
+        // given
+        User user = User.builder().build();
+        Partners partners1 = Partners.builder().name("partners1").build();
+        Partners partners2 = Partners.builder().name("partners2").build();
+        Store store = Store.builder().partners(partners1).build();
+
+        given(partnersRepository.findByUser(any(User.class)))
+                .willReturn(Optional.of(partners1));
+
+        given(storeRepository.findById(anyLong()))
+                .willReturn(Optional.empty());
+
+        // when
+        CustomException exception = assertThrows(CustomException.class,
+                () -> storeService.deleteStore(user, 1L, 1L));
+
+        // then
+        assertEquals(ErrorType.STORE_NOT_FOUND.getHttpStatus(), exception.getHttpStatus());
+        assertEquals(ErrorType.STORE_NOT_FOUND.getErrorMessage(), exception.getErrorMessage());
+    }
+
+    @Test
+    @DisplayName("예약 대기 중인 예약이 존재하는 경우 매장 삭제가 불가능하다.")
+    void deleteStore_failure_reservation() {
+
+        // given
+        User user = User.builder().build();
+        Partners partners1 = Partners.builder().name("partners1").build();
+        Partners partners2 = Partners.builder().name("partners2").build();
+        Store store = Store.builder().partners(partners1).build();
+
+        given(partnersRepository.findByUser(any(User.class)))
+                .willReturn(Optional.of(partners1));
+
+        given(storeRepository.findById(anyLong()))
+                .willReturn(Optional.of(store));
+
+        Reservation reservation1 = Reservation.builder().build();
+        Reservation reservation2 = Reservation.builder().build();
+
+        given(reservationRepository.findAllByStoreAndStatus(any(Store.class), any(ReservationStatus.class)))
+                .willReturn(new ArrayList<>(List.of(reservation1, reservation2)));
+
+
+        // when
+        CustomException exception = assertThrows(CustomException.class,
+                () -> storeService.deleteStore(user, 1L, 1L));
+
+        // then
+        assertEquals(ErrorType.FAIL_TO_DELETE_STORE.getErrorMessage(), exception.getErrorMessage());
+        assertEquals(ErrorType.FAIL_TO_DELETE_STORE.getHttpStatus(), exception.getHttpStatus());
+    }
+
+    @Test
+    @DisplayName("매장 삭제를 완료하는 경우 삭제한 매장 정보를 반환한다.")
+    void deleteStore_success() {
+        // given
+        User user = User.builder().build();
+        Partners partners1 = Partners.builder().name("partners1").build();
+        Partners partners2 = Partners.builder().name("partners2").build();
+        Store store = Store.builder().partners(partners1).build();
+
+        given(partnersRepository.findByUser(any(User.class)))
+                .willReturn(Optional.of(partners1));
+
+        given(storeRepository.findById(anyLong()))
+                .willReturn(Optional.of(store));
+
+
+        // when
+        Store deletedStore =
+                storeService.deleteStore(user, 1L, 1L);
+
+        // then
+        verify(storeRepository, times(1)).delete(store);
 
     }
 
