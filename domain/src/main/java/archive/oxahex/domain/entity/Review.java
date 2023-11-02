@@ -40,4 +40,13 @@ public class Review extends BaseEntity {
 
         reservation.setStatus(ReservationStatus.REVIEWED);
     }
+
+    public void modifyReview(Integer rating, String content) {
+        this.rating = rating;
+        this.content = content;
+    }
+
+    public void deleteReview() {
+        this.store.decreaseReviewCount();
+    }
 }

@@ -50,7 +50,8 @@ public class User extends BaseEntity {
 
 
     @Builder
-    private User(String name, String email, String password, String phoneNumber, RoleType role, LocalDateTime registeredDate) {
+    private User(Long id, String name, String email, String password, String phoneNumber, RoleType role, LocalDateTime registeredDate) {
+        this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;

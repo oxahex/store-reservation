@@ -1,11 +1,9 @@
 package archive.oxahex.api.service;
 
+import archive.oxahex.api.dto.request.ReviewModifyRequest;
 import archive.oxahex.api.exception.CustomException;
 import archive.oxahex.api.exception.ErrorType;
-import archive.oxahex.domain.entity.Partners;
-import archive.oxahex.domain.entity.Reservation;
-import archive.oxahex.domain.entity.Review;
-import archive.oxahex.domain.entity.Store;
+import archive.oxahex.domain.entity.*;
 import archive.oxahex.domain.repository.ReservationRepository;
 import archive.oxahex.domain.repository.ReviewRepository;
 import archive.oxahex.domain.repository.StoreRepository;
@@ -16,10 +14,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.parameters.P;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
@@ -115,5 +115,99 @@ class ReviewServiceTest {
 
         // then
         assertEquals(review.getStore().getReviewCount(), 2);
+    }
+
+    @Test
+    @DisplayName("해당 리뷰가 이미 삭제된 경우 리뷰를 수정할 수 없다.")
+    void modifyReview_failure_review_not_found() {
+
+        // given
+        User user = User.builder().build();
+
+        ReviewModifyRequest request = new ReviewModifyRequest();
+        request.setRating(5);
+        request.setContent("새로운 리뷰 내용으로 수정");
+
+        Partners partners = Partners.builder().build();
+        Store store = Store.builder().partners(partners).reviewCount(0).build();
+        Reservation reservation = Reservation.builder().user(user).store(store).build();
+        Review review = Review.builder().reservation(reservation).build();
+        given(reviewRepository.findById(anyLong()))
+                .willReturn(Optional.empty());
+
+        // when
+        CustomException exception = assertThrows(CustomException.class,
+                () -> reviewService.modifyReview(user, 1L, request));
+
+        // then
+        assertEquals(ErrorType.REVIEW_NOT_FOUND.getHttpStatus(), exception.getHttpStatus());
+        assertEquals(ErrorType.REVIEW_NOT_FOUND.getErrorMessage(), exception.getErrorMessage());
+    }
+
+    @Test
+    @DisplayName("리뷰 작성자가 아닌 경우 리뷰를 수정이 불가능합니다.")
+    void modifyReview_failure_user_un_matched() {
+        // given
+        User user1 = User.builder().id(1L).build();
+        User user2 = User.builder().id(2L).build();
+
+        Partners partners = Partners.builder().build();
+        Store store = Store.builder().partners(partners).reviewCount(1).build();
+        Reservation reservation = Reservation.builder().user(user1).store(store).build();
+        Review review = Review.builder()
+                .reservation(reservation)
+                .rating(3)
+                .content("이전 리뷰 내용")
+                .build();
+
+        ReviewModifyRequest request = new ReviewModifyRequest();
+        request.setRating(5);
+        request.setContent("새로운 리뷰 내용으로 수정");
+
+
+        given(reviewRepository.findById(anyLong()))
+                .willReturn(Optional.of(review));
+
+        // when: 저장된 리뷰와 다른 사용자가 요청
+        CustomException exception = assertThrows(CustomException.class,
+                () -> reviewService.modifyReview(user2, 1L, request));
+
+        // then
+        assertEquals(ErrorType.REVIEW_ACCESS_DENIED.getErrorMessage(), exception.getErrorMessage());
+        assertEquals(ErrorType.REVIEW_ACCESS_DENIED.getHttpStatus(), exception.getHttpStatus());
+    }
+
+    @Test
+    @DisplayName("리뷰 변경 시 변경된 리뷰 내용을 반환한다.")
+    void modifyReview_success() {
+        // given
+        User user = User.builder().id(1L).build();
+
+        Partners partners = Partners.builder().build();
+        Store store = Store.builder().partners(partners).reviewCount(1).build();
+        Reservation reservation = Reservation.builder().user(user).store(store).build();
+        Review review = Review.builder()
+                .reservation(reservation)
+                .rating(3)
+                .content("이전 리뷰 내용")
+                .build();
+
+        ReviewModifyRequest request = new ReviewModifyRequest();
+        request.setRating(5);
+        request.setContent("새로운 리뷰 내용으로 수정");
+
+
+        given(reviewRepository.findById(anyLong()))
+                .willReturn(Optional.of(review));
+
+        given(reviewRepository.save(any(Review.class)))
+                .willReturn(review);
+
+        // when
+        Review modifiedReview = reviewService.modifyReview(user, 1L, request);
+
+        // then
+        assertEquals(modifiedReview.getContent(), "새로운 리뷰 내용으로 수정");
+        assertEquals(modifiedReview.getRating(), 5);
     }
 }

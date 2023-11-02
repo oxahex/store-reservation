@@ -1,5 +1,6 @@
 package archive.oxahex.api.service;
 
+import archive.oxahex.api.dto.request.ReviewModifyRequest;
 import archive.oxahex.api.exception.CustomException;
 import archive.oxahex.api.exception.ErrorType;
 import archive.oxahex.domain.entity.Reservation;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -56,6 +58,45 @@ public class ReviewService {
     }
 
     /**
+     * 리뷰 수정
+     * @param user 리뷰 작성자
+     * @param request 변경할 리뷰 내용
+     */
+    public Review modifyReview(User user, Long reviewId, ReviewModifyRequest request) {
+
+        // 리뷰
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new CustomException(ErrorType.REVIEW_NOT_FOUND));
+
+        // 리뷰 작성자와 유저가 일치하지 않는 경우
+        if (!Objects.equals(review.getUser().getId(), user.getId())) {
+            throw new CustomException(ErrorType.REVIEW_ACCESS_DENIED);
+        }
+
+        review.modifyReview(request.getRating(), request.getContent());
+
+        return reviewRepository.save(review);
+
+    }
+
+    public Review deleteReview(User user, Long reviewId) {
+
+        // 리뷰
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new CustomException(ErrorType.REVIEW_NOT_FOUND));
+
+        // 리뷰 작성자와 유저가 일치하지 않는 경우
+        if (review.getUser() != user) {
+            throw new CustomException(ErrorType.REVIEW_ACCESS_DENIED);
+        }
+
+        review.deleteReview();
+        reviewRepository.delete(review);
+
+        return review;
+    }
+
+    /**
      * 특정 매장의 리뷰 조회
      */
     public List<Review> getAllReviews(Long storeId) {
@@ -65,4 +106,5 @@ public class ReviewService {
 
         return reviewRepository.findAllByStore(store);
     }
+
 }

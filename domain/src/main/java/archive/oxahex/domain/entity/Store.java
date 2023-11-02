@@ -54,6 +54,9 @@ public class Store extends BaseEntity {
         this.reviewCount++;
     }
 
+    // 리뷰 개수 감소
+    public void decreaseReviewCount() { this.reviewCount--; }
+
 
     @Builder
     private Store(

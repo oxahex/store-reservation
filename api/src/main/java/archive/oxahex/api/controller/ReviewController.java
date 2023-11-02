@@ -1,17 +1,21 @@
 package archive.oxahex.api.controller;
 
 import archive.oxahex.api.dto.ReviewDto;
+import archive.oxahex.api.dto.request.ReviewModifyRequest;
 import archive.oxahex.api.dto.request.ReviewRequest;
+import archive.oxahex.api.security.AuthUser;
 import archive.oxahex.api.service.AuthService;
 import archive.oxahex.api.service.ReviewService;
 import archive.oxahex.domain.entity.Review;
 
+import archive.oxahex.domain.entity.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -43,6 +47,43 @@ public class ReviewController {
                 ReviewDto.fromEntityToReviewInfo(review);
 
         return ResponseEntity.ok().body(reviewInfo);
+    }
+
+    /**
+     * 리뷰 수정
+     * 해당 리뷰를 작성자만 수정 가능
+     */
+    @PutMapping("/{reviewId}")
+    public ResponseEntity<ReviewDto.Info> modifyReview(
+            @PathVariable Long reviewId,
+            @RequestBody @Valid ReviewModifyRequest request
+            ) {
+
+        // 유저
+        AuthUser authUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = authUser.getUser();
+
+        Review review = reviewService.modifyReview(user, reviewId, request);
+
+        ReviewDto.Info reviewInfo = ReviewDto.fromEntityToReviewInfo(review);
+
+        return ResponseEntity.ok().body(reviewInfo);
+    }
+
+    @DeleteMapping("/{reviewId}")
+    public ResponseEntity<ReviewDto.Info> deleteReview(
+            @PathVariable Long reviewId
+    ) {
+        // 유저
+        AuthUser authUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = authUser.getUser();
+
+        Review review = reviewService.deleteReview(user, reviewId);
+
+        ReviewDto.Info reviewInfo = ReviewDto.fromEntityToReviewInfo(review);
+
+        return ResponseEntity.ok().body(reviewInfo);
+
     }
 
     /**
