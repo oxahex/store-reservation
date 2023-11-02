@@ -17,7 +17,7 @@ public class PartnersService {
 
     /**
      * 사업자가 생성한 모든 파트너스 목록 조회
-     * 파트너스 이름 반환(매장 등록 시 사용)
+     * 파트너스 이름 반환(매장 등록/수정/삭제 시 사용)
      */
     public Partners getPartners(User user) {
 

@@ -41,6 +41,7 @@ public class StoreDto {
         private String description;
         private Integer tableCount;
         private Integer reviewCount;
+        private String businessNumber;
     }
 
     public static StoreDto.Detail fromEntityToStoreDetail(Store store) {
@@ -51,6 +52,7 @@ public class StoreDto {
         storeDetail.setDescription(store.getDescription());
         storeDetail.setTableCount(store.getTableCount());
         storeDetail.setReviewCount(store.getReviewCount());
+        storeDetail.setBusinessNumber(store.getBusinessNumber());
 
         return storeDetail;
     }

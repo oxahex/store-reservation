@@ -3,6 +3,7 @@ package archive.oxahex.api.controller;
 import archive.oxahex.api.dto.PartnersDto;
 import archive.oxahex.api.dto.ReservationDto;
 import archive.oxahex.api.dto.StoreDto;
+import archive.oxahex.api.dto.request.StoreModifyRequest;
 import archive.oxahex.api.dto.request.StoreRegisterRequest;
 import archive.oxahex.api.security.AuthUser;
 import archive.oxahex.api.service.PartnersService;
@@ -18,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -73,6 +73,21 @@ public class PartnersController {
 
         // 매장 정보 반환
         return ResponseEntity.ok().body(storeInfo);
+    }
+
+    /**
+     * 저장한 매장 정보 변경
+     * 매장 ID와 변경할 정보를 받음(사업자 번호는 변경 불가)
+     */
+    @PutMapping("/stores/{storeId}")
+    public ResponseEntity<StoreDto.Detail> modifyStore(
+            @PathVariable Long storeId,
+            @RequestBody @Valid StoreModifyRequest request
+    ) {
+        Store store = storeService.modifyStore(storeId, request);
+        StoreDto.Detail storeDetail = StoreDto.fromEntityToStoreDetail(store);
+
+        return ResponseEntity.ok().body(storeDetail);
     }
 
     /**

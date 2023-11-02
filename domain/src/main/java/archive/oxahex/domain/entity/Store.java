@@ -78,4 +78,14 @@ public class Store extends BaseEntity {
 
         this.registeredDate = registeredDate;
     }
+
+    public void modifyStoreInfo(
+            String name, String address, String description, Integer tableCount
+    ) {
+
+        this.name = name;
+        this.address = address;
+        this.description = description;
+        this.tableCount = tableCount;
+    }
 }

@@ -1,6 +1,7 @@
 package archive.oxahex.api.service;
 
 import archive.oxahex.api.dto.SortType;
+import archive.oxahex.api.dto.request.StoreModifyRequest;
 import archive.oxahex.api.dto.request.StoreRegisterRequest;
 import archive.oxahex.api.exception.ErrorType;
 import archive.oxahex.api.exception.CustomException;
@@ -76,5 +77,37 @@ public class StoreService {
     public Store getStore(Long storeId) {
         return storeRepository.findById(storeId)
                 .orElseThrow(() -> new CustomException(ErrorType.STORE_NOT_FOUND));
+    }
+
+    /**
+     * 매장 정보 수정
+     * @param storeId 변경할 매장 ID
+     */
+    public Store modifyStore(Long storeId, StoreModifyRequest request) {
+
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new CustomException(ErrorType.STORE_NOT_FOUND));
+
+
+        System.out.println(request.getAddress());
+        store.modifyStoreInfo(
+                request.getName(),
+                request.getAddress(),
+                request.getDescription(),
+                request.getTableCount()
+        );
+
+        return storeRepository.save(store);
+    }
+
+    /**
+     * 매장 삭제
+     * <ul>
+     *     <li>진행 중인 예약이 있는 경우 삭제 불가</li>
+     * </ul>
+     * @param storeId
+     */
+    public void deleteStore(Long storeId) {
+
     }
 }
