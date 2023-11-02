@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -83,8 +84,18 @@ public class StoreService {
      * 매장 정보 수정
      * @param storeId 변경할 매장 ID
      */
-    public Store modifyStore(Long storeId, StoreModifyRequest request) {
+    public Store modifyStore(User user, Long partnersId, Long storeId, StoreModifyRequest request) {
 
+        // 해당 유저의 매장인지 확인
+        Partners partners = partnersRepository.findByUser(user)
+                .orElseThrow(() -> new CustomException(ErrorType.PARTNERS_NOT_FOUND));
+
+        // 해당 매장 소유주가 아닌 경우
+        if (!Objects.equals(partners.getId(), partnersId)) {
+            throw new CustomException(ErrorType.STORE_ACCESS_DENIED);
+        }
+
+        // 매장 존재 여부 확인
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new CustomException(ErrorType.STORE_NOT_FOUND));
 

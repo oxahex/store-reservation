@@ -79,12 +79,17 @@ public class PartnersController {
      * 저장한 매장 정보 변경
      * 매장 ID와 변경할 정보를 받음(사업자 번호는 변경 불가)
      */
-    @PutMapping("/stores/{storeId}")
+    @PutMapping("/{partnersId}/stores/{storeId}")
     public ResponseEntity<StoreDto.Detail> modifyStore(
+            @PathVariable Long partnersId,
             @PathVariable Long storeId,
             @RequestBody @Valid StoreModifyRequest request
     ) {
-        Store store = storeService.modifyStore(storeId, request);
+        // 유저
+        AuthUser authUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = authUser.getUser();
+
+        Store store = storeService.modifyStore(user, partnersId, storeId, request);
         StoreDto.Detail storeDetail = StoreDto.fromEntityToStoreDetail(store);
 
         return ResponseEntity.ok().body(storeDetail);
