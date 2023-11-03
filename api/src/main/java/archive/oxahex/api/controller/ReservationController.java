@@ -6,7 +6,6 @@ import archive.oxahex.api.dto.request.ReservationRequest;
 import archive.oxahex.api.security.AuthUser;
 import archive.oxahex.api.service.KioskService;
 import archive.oxahex.api.service.ReservationService;
-import archive.oxahex.api.service.AuthService;
 import archive.oxahex.domain.entity.Reservation;
 import archive.oxahex.domain.entity.User;
 import jakarta.validation.Valid;
@@ -29,7 +28,7 @@ public class ReservationController {
     private final KioskService kioskService;
 
     /**
-     * 매장 예약 요청 기능
+     * 매장 예약 요청
      */
     @PostMapping("/stores/{storeId}")
     public ResponseEntity<ReservationDto.Detail> requestReservation(
@@ -50,8 +49,10 @@ public class ReservationController {
 
     /**
      * 예약 내역 조회 기능
-     * 검색 타입 PENDING, ALLOWED, REJECTED, CONFIRMED
-     * path param 미입력 시 전체 검색
+     * <ol>
+     *     <li>검색 타입 PENDING, CANCELLED, ALLOWED, REJECTED, CONFIRMED, REVIEWED</li>
+     *     <li>path param 미입력 시 전체 검색</li>
+     * </ol>
      */
     @GetMapping
     public ResponseEntity<List<ReservationDto.Info>> getReservations(
@@ -89,8 +90,10 @@ public class ReservationController {
 
     /**
      * 특정 예약 취소 기능
-     * PENDING 상태의 예약인 경우만 취소 가능
-     * 예약 일자 8시간 이전에 예약된 건만 취소 가능
+     * <ol>
+     *     <li>PENDING 상태의 예약인 경우만 취소 가능</li>
+     *     <li>예약 일자 8시간 이전에 예약된 건만 취소 가능</li>
+     * </ol>
      */
     @PostMapping("/{reservationId}/cancel")
     public ResponseEntity<ReservationDto.Detail> cancelReservation(
@@ -104,21 +107,4 @@ public class ReservationController {
 
         return ResponseEntity.ok().body(reservationDetail);
     }
-
-    /**
-     * 키오스크 입장 확인
-     * 도착 시간
-     */
-    @PostMapping("/{reservationId}/kiosk")
-    public ResponseEntity<ReservationDto.Info> confirmReservationKiosk(
-            @PathVariable Long reservationId
-    ) {
-        Reservation reservation = kioskService.checkStoreEntry(reservationId);
-
-        ReservationDto.Info reservationInfo =
-                ReservationDto.fromEntityToReservationInfo(reservation);
-
-        return ResponseEntity.ok().body(reservationInfo);
-    }
-
 }

@@ -1,22 +1,17 @@
 package archive.oxahex.api.controller;
 
-import archive.oxahex.api.configuration.SecurityConfig;
 import archive.oxahex.api.dto.request.JoinPartnersRequest;
 import archive.oxahex.api.dto.request.JoinRequest;
 import archive.oxahex.api.dto.request.LoginRequest;
 import archive.oxahex.api.mock.WithMockUser;
 import archive.oxahex.api.security.AuthUser;
-import archive.oxahex.api.security.JwtAuthenticationFilter;
-import archive.oxahex.api.security.JwtAuthorizationFilter;
 import archive.oxahex.api.security.TokenProvider;
 import archive.oxahex.api.service.AuthService;
 import archive.oxahex.domain.entity.Partners;
 import archive.oxahex.domain.entity.User;
 import archive.oxahex.domain.type.RoleType;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.antlr.v4.runtime.Token;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -27,11 +22,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureDataJpa;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.ActiveProfiles;

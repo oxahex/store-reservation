@@ -24,6 +24,7 @@ public enum ErrorType {
     ALREADY_EXIST_PARTNERS(HttpStatus.CONFLICT, "이미 등록된 사업자 입니다."),
     BUSINESS_NUMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "등록되지 않은 사업자 번호입니다."),
     UN_MATCH_PARTNERS_USER(HttpStatus.FORBIDDEN, "본인의 사업자 번호가 아닙니다."),
+    UN_MATCH_KIOSK_STORE(HttpStatus.FORBIDDEN, "예약된 매장의 키오스크가 아닙니다."),
     INVALID_SORT_TYPE(HttpStatus.BAD_REQUEST, "올바른 정렬 형식이 아닙니다."),
     INVALID_SEARCH_CONDITION(HttpStatus.BAD_REQUEST, "올바른 검색 조건이 아닙니다."),
     WRONG_PASSWORD(HttpStatus.UNAUTHORIZED, "패스워드가 일치하지 않습니다."),

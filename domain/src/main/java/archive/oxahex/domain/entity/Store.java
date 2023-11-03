@@ -61,6 +61,7 @@ public class Store extends BaseEntity {
 
     @Builder
     private Store(
+            Long id,
             String name,
             String address,
             String description,
@@ -70,6 +71,7 @@ public class Store extends BaseEntity {
             Partners partners,
             LocalDateTime registeredDate
     ) {
+        this.id = id;
         this.name = name;
         this.address = address;
         this.description = description;

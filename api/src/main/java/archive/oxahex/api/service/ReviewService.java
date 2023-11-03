@@ -30,8 +30,11 @@ public class ReviewService {
     private final StoreRepository storeRepository;
 
     /**
-     * 예약 건 당 하나의 리뷰 작성
-     * 해당 유저의 예약 내역 중 예약 상태가 CONFIRMED인 경우 리뷰 작성 가능
+     * 리뷰 작성
+     * <ol>
+     *     <li>예약 건 당 하나의 리뷰 작성 가능</li>
+     *     <li>예약 상태가 CONFIRMED인 경우 리뷰 작성 가능</li>
+     * </ol>
      */
     @Transactional
     public Review addReview(Long reservationId, Integer rating, String content) {
@@ -74,6 +77,12 @@ public class ReviewService {
 
     }
 
+    /**
+     * 리뷰 삭제
+     * @param user 요청 유저
+     * @param reviewId 삭제할 리뷰 ID
+     * @return 삭제한 리뷰 정보 반환
+     */
     @Transactional
     public Review deleteReview(User user, Long reviewId) {
 
@@ -97,6 +106,16 @@ public class ReviewService {
         return reviewRepository.findAllByStore(store);
     }
 
+    /**
+     * 리뷰 수정, 삭제 검증
+     * <ol>
+     *     <li>리뷰 존재 여부 확인</li>
+     *     <li>요청한 유저와 리뷰 작성자 일치 여부 확인</li>
+     * </ol>
+     * @param user 리뷰 삭제, 수정 요청 유저
+     * @param reviewId 삭제, 수정할 리뷰 ID
+     * @return validation을 거친 Review 데이터 반환
+     */
     private Review validateReviewByUser(User user, Long reviewId) {
 
         // 리뷰

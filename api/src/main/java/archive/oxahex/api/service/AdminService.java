@@ -18,6 +18,11 @@ public class AdminService {
 
     private final ReviewRepository reviewRepository;
 
+    /**
+     * 관리자 리뷰 삭제 기능(따로 검증하지 않음)
+     * @param reviewId 삭제할 리뷰 ID
+     * @return 삭제한 리뷰 정보
+     */
     @Transactional
     public Review deleteReview(Long reviewId) {
 

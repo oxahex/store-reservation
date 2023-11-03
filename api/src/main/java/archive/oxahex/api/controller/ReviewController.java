@@ -32,7 +32,10 @@ public class ReviewController {
 
     /**
      * 리뷰 작성
-     * 예약 내역에서 이용이 확인된 경우에만 리뷰 작성 가능
+     * <ol>
+     *     <li>예약 내역에서 이용이 확인된 경우에만 리뷰 작성 가능</li>
+     *     <li>예약자 본인인 경우에만 리뷰 작성 가능</li>
+     * </ol>
      */
     @PostMapping("/reservations/{reservationId}")
     public ResponseEntity<ReviewDto.Info> review(
@@ -51,7 +54,9 @@ public class ReviewController {
 
     /**
      * 리뷰 수정
-     * 해당 리뷰를 작성자만 수정 가능
+     * <ol>
+     *     <li>해당 리뷰 작성자만 수정 가능</li>
+     * </ol>
      */
     @PutMapping("/{reviewId}")
     public ResponseEntity<ReviewDto.Info> modifyReview(
@@ -70,6 +75,15 @@ public class ReviewController {
         return ResponseEntity.ok().body(reviewInfo);
     }
 
+    /**
+     * 리뷰 삭제
+     * <ol>
+     *     <li>리뷰 작성자만 삭제 가능</li>
+     *     <li>관리자의 경우 리뷰 삭제가 가능하나, 다른 컨트롤러로 분리</li>
+     * </ol>
+     * @param reviewId 삭제할 리뷰 ID
+     * @return 삭제한 리뷰 정보
+     */
     @DeleteMapping("/{reviewId}")
     public ResponseEntity<ReviewDto.Info> deleteReview(
             @PathVariable Long reviewId
@@ -94,7 +108,6 @@ public class ReviewController {
             @PathVariable Long storeId
     ) {
 
-        log.info("Review 조회");
         List<Review> reviews = reviewService.getAllReviews(storeId);
         List<ReviewDto.Info> reviewInfos = reviews.stream()
                 .map(ReviewDto::fromEntityToReviewInfo).toList();

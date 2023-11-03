@@ -34,8 +34,10 @@ public class ReservationService {
 
     /**
      * 상점 예약 요청
-     * <p>상점 ID로 등록된 상점을 찾아 남아 있는 자리를 확인
-     * <p>(프론트단에서 처리하더라도, 값 변경 가능하므로 다시 확인)
+     * <ol>
+     *     <li>상점 ID로 등록된 상점을 찾아 남아 있는 자리를 확인</li>
+     *     <li>프론트단에서 처리하더라도, 값 변경 가능하므로 다시 확인</li>
+     * </ol>
      */
     @Transactional
     public Reservation requestReservation(
@@ -65,9 +67,12 @@ public class ReservationService {
     // TODO: 같은 데이터를 조회하는데 조건이 다양한 경우 어떻게 처리하면 좋을지?
 
     /**
-     * 유저 정보(user id)와 상태 정보로 예약 정보를 가져옴
-     * 예약 대시/승인/거절 상태별로 조회 가능
-     * status가 없는 경우 전체 조회 처리
+     * 유저가 진행한 모든 예약 내역 조회
+     * <ol>
+     *     <li>유저 정보(user id)와 상태 정보로 예약 정보를 가져옴</li>
+     *     <li>예약 대시/승인/거절 상태별로 조회 가능</li>
+     *     <li>status가 없는 경우 전체 조회 처리</li>
+     * </ol>
      */
     public List<Reservation> getAllReservations(
             User user, ReservationSearchType searchType
@@ -96,7 +101,7 @@ public class ReservationService {
 
     /**
      * 예약 대기 상태 목록 조회(파트너스)
-     * 등록한 파트너스로 매장 목록 반환 -> 전체 매장의 대기중 예약 목록 조회
+     * <p>등록한 파트너스로 매장 목록 반환 -> 전체 매장의 대기중 예약 목록 조회</p>
      */
     public List<Reservation> getAllPendingReservations(Partners partners) {
 

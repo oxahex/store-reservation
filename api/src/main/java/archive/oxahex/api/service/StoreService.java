@@ -30,9 +30,11 @@ public class StoreService {
     private final ReservationRepository reservationRepository;
 
     /**
-     * 매장 정보를 받아 새로운 매장 등록
-     * 권한이 있는 사용자만 등록 가능하도록 이전에 처리하였으므로, ROLE_PARTNERS 만 등록 가능
-     * 매장을 등록할 파트너스와 매장 정보를 받아 매장을 저장
+     * 새로운 매장 등록
+     * <ol>
+     *     <li>권한이 있는 사용자만 등록 가능하도록 컨트롤러 단에서 처리하였으므로, ROLE_PARTNERS 만 등록 가능</li>
+     *     <li>매장을 등록할 파트너스와 매장 정보를 받아 매장을 저장</li>
+     * </ol>
      */
     @Transactional
     public Store registerStore(User user, StoreRegisterRequest request) {
@@ -120,7 +122,7 @@ public class StoreService {
      * <ul>
      *     <li>진행 중인 예약이 있는 경우 삭제 불가</li>
      * </ul>
-     * @param storeId
+     * @param storeId 삭제할 매장 ID
      */
     @Transactional
     public Store deleteStore(User user, Long partnersId, Long storeId) {

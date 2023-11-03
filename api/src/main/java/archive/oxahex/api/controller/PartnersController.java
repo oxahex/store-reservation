@@ -37,7 +37,7 @@ public class PartnersController {
 
     /**
      * 파트너스 정보 조회
-     * 유저가 생성한 파트너스 정보 조회
+     * <p>유저가 생성한 파트너스 정보 조회</p>
      */
     @GetMapping
     public ResponseEntity<PartnersDto.Detail> getPartners() {
@@ -54,9 +54,13 @@ public class PartnersController {
 
 
     /**
-     * PARTNERS 회원인 경우 매장 등록
-     * 매장 정보를 입력값으로 받음
-     * 매장 등록 성공 시 등록 정보 반환
+     * 매장 등록
+     * <ol>
+     *     <li>PARTNERS 권한이 있는 경우에만 접근 가능</li>
+     *     <li>매장 정보를 입력값으로 받음</li>
+     *     <li>하나의 파트너스에 여러 개의 매장 등록 가능</li>
+     *     <li>매장 등록 성공 시 등록 정보 반환</li>
+     * </ol>
      */
     @PostMapping("{partnersId}/store")
     public ResponseEntity<StoreDto.Info> registerStore(
@@ -77,7 +81,9 @@ public class PartnersController {
 
     /**
      * 저장한 매장 정보 변경
-     * 파트너스 ID, 매장 ID와 변경할 정보를 받음(사업자 번호는 변경 불가)
+     * <ol>
+     *     <li>파트너스 ID, 매장 ID와 변경할 정보를 받음(사업자 번호는 변경 불가)</li>
+     * </ol>
      */
     @PutMapping("/{partnersId}/stores/{storeId}")
     public ResponseEntity<StoreDto.Detail> modifyStore(
@@ -97,7 +103,9 @@ public class PartnersController {
 
     /**
      * 등록 매장 삭제
-     * 파트너스 ID와 매장 ID를 받아 삭제
+     * <ol>
+     *     <li>파트너스 ID와 매장 ID를 받아 삭제</li>
+     * </ol>
      */
     @DeleteMapping("/{partnersId}/stores/{storeId}")
     public ResponseEntity<StoreDto.Detail> deleteStore(
@@ -116,7 +124,10 @@ public class PartnersController {
     }
 
     /**
-     * 대기 상태 예약 목록 조회(매장 별 조회 x, 전체 조회)
+     * 대기 상태 예약 목록 조회
+     * <ol>
+     *     <li>매장 별 조회, 파트너스 별 조회가 아니라 등록한 모든 매장에 대한 대기 상태 예약 전체 조회</li>
+     * </ol>
      */
     @GetMapping("/reservations")
     public ResponseEntity<List<ReservationDto.Info>> getAllPendingReservation() {
