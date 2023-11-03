@@ -66,13 +66,7 @@ public class ReviewService {
     public Review modifyReview(User user, Long reviewId, ReviewModifyRequest request) {
 
         // 리뷰
-        Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new CustomException(ErrorType.REVIEW_NOT_FOUND));
-
-        // 리뷰 작성자와 유저가 일치하지 않는 경우
-        if (!Objects.equals(review.getUser().getId(), user.getId())) {
-            throw new CustomException(ErrorType.REVIEW_ACCESS_DENIED);
-        }
+        Review review = validateReviewByUser(user, reviewId);
 
         review.modifyReview(request.getRating(), request.getContent());
 
@@ -84,19 +78,11 @@ public class ReviewService {
     public Review deleteReview(User user, Long reviewId) {
 
         // 리뷰
-        Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new CustomException(ErrorType.REVIEW_NOT_FOUND));
-
-        // 리뷰 작성자와 유저가 일치하지 않는 경우
-        if (!Objects.equals(review.getUser().getId(), user.getId())) {
-            throw new CustomException(ErrorType.REVIEW_ACCESS_DENIED);
-        }
-
+        Review review = validateReviewByUser(user, reviewId);
 
         review.getStore().decreaseReviewCount();
         reviewRepository.delete(review);
 
-        System.out.println("count: " + review.getStore().getReviewCount());
         return review;
     }
 
@@ -109,6 +95,20 @@ public class ReviewService {
                 .orElseThrow(() -> new CustomException(ErrorType.STORE_NOT_FOUND));
 
         return reviewRepository.findAllByStore(store);
+    }
+
+    private Review validateReviewByUser(User user, Long reviewId) {
+
+        // 리뷰
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new CustomException(ErrorType.REVIEW_NOT_FOUND));
+
+        // 리뷰 작성자와 유저가 일치하지 않는 경우
+        if (!Objects.equals(review.getUser().getId(), user.getId())) {
+            throw new CustomException(ErrorType.REVIEW_ACCESS_DENIED);
+        }
+
+        return review;
     }
 
 }
