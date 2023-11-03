@@ -19,6 +19,10 @@ public class Store extends BaseEntity {
     @Column(name = "store_id")
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "partners_id")
+    private Partners partners;
+
     private String name;
     private String address;
     private String description;
@@ -35,9 +39,6 @@ public class Store extends BaseEntity {
     @Column(name = "registered_date")
     private LocalDateTime registeredDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "partners_id")
-    private Partners partners;
 
     // 예약 승인 시 테이블 수 감소 처리
     public void removeTableCount(int useTableCount) {

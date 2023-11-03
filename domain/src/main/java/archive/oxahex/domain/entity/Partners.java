@@ -20,7 +20,7 @@ public class Partners extends BaseEntity {
     @Column(length = 100, unique = true)
     private String name;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
