@@ -23,7 +23,6 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/reviews")
-@PreAuthorize("hasRole('USER') or hasRole('PARTNERS')")
 @RequiredArgsConstructor
 public class ReviewController {
 
@@ -35,6 +34,7 @@ public class ReviewController {
      * 예약 내역에서 이용이 확인된 경우에만 리뷰 작성 가능
      */
     @PostMapping("/reservations/{reservationId}")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ReviewDto.Info> review(
             @PathVariable Long reservationId,
             @RequestBody @Valid ReviewRequest request
@@ -54,6 +54,7 @@ public class ReviewController {
      * 해당 리뷰를 작성자만 수정 가능
      */
     @PutMapping("/{reviewId}")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ReviewDto.Info> modifyReview(
             @PathVariable Long reviewId,
             @RequestBody @Valid ReviewModifyRequest request
@@ -71,6 +72,7 @@ public class ReviewController {
     }
 
     @DeleteMapping("/{reviewId}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ReviewDto.Info> deleteReview(
             @PathVariable Long reviewId
     ) {
@@ -89,7 +91,8 @@ public class ReviewController {
     /**
      * 특정 매장 리뷰 조회
      */
-    @GetMapping("/{storeId}")
+    @GetMapping("/stores/{storeId}")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<ReviewDto.Info>> getStoreReviews(
             @PathVariable Long storeId
     ) {

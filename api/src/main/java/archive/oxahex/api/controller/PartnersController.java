@@ -20,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -59,7 +58,7 @@ public class PartnersController {
      * 매장 정보를 입력값으로 받음
      * 매장 등록 성공 시 등록 정보 반환
      */
-    @PostMapping("/store")
+    @PostMapping("{partnersId}/store")
     public ResponseEntity<StoreDto.Info> registerStore(
             @RequestBody @Valid StoreRegisterRequest request
     ) {
@@ -142,7 +141,7 @@ public class PartnersController {
     /**
      * 특정 예약 거절
      */
-    @PatchMapping("/reservations/reject/{reservationId}")
+    @PatchMapping("/reservations/{reservationId}/reject")
     public ResponseEntity<ReservationDto.Detail> rejectReservation(
             @PathVariable Long reservationId
     ){
@@ -158,7 +157,7 @@ public class PartnersController {
     /**
      * 특정 예약 승인
      */
-    @PatchMapping("/reservations/allow/{reservationId}")
+    @PatchMapping("/reservations/{reservationId}/allow")
     public ResponseEntity<ReservationDto.Detail> allowReservation(
             @PathVariable Long reservationId
     ) {

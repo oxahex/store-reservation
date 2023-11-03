@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/stores")
-@PreAuthorize("hasRole('USER') or hasRole('PARTNERS')")
+@PreAuthorize("hasRole('USER')")
 @RequiredArgsConstructor
 public class StoreController {
 

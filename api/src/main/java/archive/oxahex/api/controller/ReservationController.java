@@ -21,7 +21,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/reservations")
-@PreAuthorize("hasRole('USER') or hasRole('PARTNERS')")
+@PreAuthorize("hasRole('USER')")
 @RequiredArgsConstructor
 public class ReservationController {
 
@@ -31,7 +31,7 @@ public class ReservationController {
     /**
      * 매장 예약 요청 기능
      */
-    @PostMapping("/{storeId}")
+    @PostMapping("/stores/{storeId}")
     public ResponseEntity<ReservationDto.Detail> requestReservation(
             @PathVariable Long storeId,
             @RequestBody @Valid ReservationRequest request

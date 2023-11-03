@@ -76,7 +76,7 @@ public class AuthController {
      * @return 등록한 파트너스 정보, 새로 발급된 JWT Token
      */
     @PostMapping("/partners")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('PARTNERS')")
     public ResponseEntity<JoinPartnersResponse> joinPartners(
             @RequestBody @Valid JoinPartnersRequest request
     ) {
